@@ -17,7 +17,7 @@ The stack I chose here is:
 
 ***
 
-I suppose it's already apparent, that the requirement (1) is fully handled by Serwist, while requirements (2) and (3) by Tanstack Query. Meaning, they are not intertwined, which is nice.
+I suppose it's already apparent, that the requirement (1) is fully handled by Serwist, while requirements (2) and (3) by Tanstack Query. Meaning, they are not intertwined, which is nice. This allows me to structure the guide in three steps, making the app
 
 It's good to mention that service workers interception of fetch events, and through that you could cache the server state, but that would require you to build the caching yourself. And using it with tanstack would be annoying cause, you basically manage the server state using both of them. A benefit from using a serwice work though is that you _could_ replay the requests when the device is back online, even if the webapp is closed. This is a nice feature, but IMHO not worth the hastle.
 
@@ -25,3 +25,5 @@ One also might ask, why not a mobile app? Which is a valid question, considering
 - Skill issues. I can't find the time to learn a new mobile app development framework (like Flutter)
 - React Native sucks. There are development quirks around components, which are different from HTML, and writing UI doesn't translate 1:1 from HTML to Native. Also, the UX while using it doesn't feel native IMHO. In that regard, the PWA is extremely smooth, if made well.
 - I'm really well versed with React, and not bound to make native, so why not just stick to what I'm good at? 
+
+## Building the App
