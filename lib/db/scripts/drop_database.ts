@@ -1,4 +1,4 @@
-import db from "../_index";
+import db from "..";
 
 async function dropDatabase() {
 	await db.execute(`DROP TABLE IF EXISTS "users";`);

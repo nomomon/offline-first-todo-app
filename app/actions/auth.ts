@@ -2,7 +2,7 @@
 
 import { hash } from "bcryptjs";
 import { eq } from "drizzle-orm";
-import db from "@/lib/db/_index";
+import db from "@/lib/db";
 import { usersTable } from "@/lib/db/schema";
 
 export async function signUp(formData: FormData) {

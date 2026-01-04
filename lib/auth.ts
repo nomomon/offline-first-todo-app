@@ -1,9 +1,10 @@
 import { compare } from "bcryptjs";
 import { eq } from "drizzle-orm";
-import type { NextAuthOptions } from "next-auth";
+import { getServerSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
-import db from "@/lib/db/_index";
+import db from "@/lib/db";
+import { getUserByEmail } from "@/lib/db/queries/users";
 import { usersTable } from "@/lib/db/schema";
 
 export const authOptions: NextAuthOptions = {
@@ -56,3 +57,13 @@ export const authOptions: NextAuthOptions = {
 		signIn: "/login",
 	},
 };
+
+export async function getAuthenticatedUser() {
+	const session = await getServerSession(authOptions);
+	if (!session?.user?.email) {
+		return null;
+	}
+
+	const user = await getUserByEmail(session.user.email);
+	return user || null;
+}

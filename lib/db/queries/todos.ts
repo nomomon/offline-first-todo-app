@@ -1,9 +1,34 @@
-import { eq } from "drizzle-orm";
-import db from "../_index";
+import { and, desc, eq, gt, isNull, lte, type SQL } from "drizzle-orm";
+import db from "..";
 import { todosTable } from "../schema";
 
-export async function getTodos(userId: number) {
-	return db.select().from(todosTable).where(eq(todosTable.userId, userId));
+export type TodoFilter = "inbox" | "today" | "upcoming" | "completed";
+
+export async function getTodos(userId: number, filter?: TodoFilter) {
+	const conditions: (SQL | undefined)[] = [eq(todosTable.userId, userId)];
+	const today = new Date().toISOString().split("T")[0];
+
+	if (filter === "inbox") {
+		conditions.push(
+			and(isNull(todosTable.dueDate), eq(todosTable.isCompleted, false)),
+		);
+	} else if (filter === "today") {
+		conditions.push(
+			and(lte(todosTable.dueDate, today), eq(todosTable.isCompleted, false)),
+		);
+	} else if (filter === "upcoming") {
+		conditions.push(
+			and(gt(todosTable.dueDate, today), eq(todosTable.isCompleted, false)),
+		);
+	} else if (filter === "completed") {
+		conditions.push(eq(todosTable.isCompleted, true));
+	}
+
+	return db
+		.select()
+		.from(todosTable)
+		.where(and(...conditions))
+		.orderBy(desc(todosTable.createdAt));
 }
 
 export async function addTodo(todo: typeof todosTable.$inferInsert) {
@@ -12,29 +37,28 @@ export async function addTodo(todo: typeof todosTable.$inferInsert) {
 
 export async function updateTodo(
 	id: number,
+	userId: number,
 	todo: Partial<typeof todosTable.$inferInsert>,
 ) {
 	return db
 		.update(todosTable)
 		.set(todo)
-		.where(eq(todosTable.id, id))
+		.where(and(eq(todosTable.id, id), eq(todosTable.userId, userId)))
 		.returning();
 }
 
-export async function deleteTodo(id: number) {
-	return db.delete(todosTable).where(eq(todosTable.id, id)).returning();
+export async function deleteTodo(id: number, userId: number) {
+	return db
+		.delete(todosTable)
+		.where(and(eq(todosTable.id, id), eq(todosTable.userId, userId)))
+		.returning();
 }
 
-export async function toggleTodo(id: number) {
-	// First fetch the current status to toggle it, or use a raw sql query if preferred.
-	// For simplicity with Drizzle's type safety, we can fetch then update,
-	// or just pass the new boolean value in updateTodo.
-	// However, a dedicated toggle function usually implies just passing the ID.
-	// Let's do a fetch and update for now to be safe and explicit.
+export async function toggleTodo(id: number, userId: number) {
 	const [todo] = await db
 		.select({ isCompleted: todosTable.isCompleted })
 		.from(todosTable)
-		.where(eq(todosTable.id, id));
+		.where(and(eq(todosTable.id, id), eq(todosTable.userId, userId)));
 
 	if (!todo) {
 		throw new Error("Todo not found");
@@ -43,6 +67,6 @@ export async function toggleTodo(id: number) {
 	return db
 		.update(todosTable)
 		.set({ isCompleted: !todo.isCompleted })
-		.where(eq(todosTable.id, id))
+		.where(and(eq(todosTable.id, id), eq(todosTable.userId, userId)))
 		.returning();
 }
