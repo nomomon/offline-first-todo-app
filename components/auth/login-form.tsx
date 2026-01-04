@@ -1,3 +1,8 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -13,8 +18,32 @@ export function LoginForm({
 	className,
 	...props
 }: React.ComponentProps<"form">) {
+	const router = useRouter();
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		const result = await signIn("credentials", {
+			email,
+			password,
+			redirect: false,
+		});
+
+		if (result?.ok) {
+			router.push("/");
+		} else {
+			// Handle error
+			console.error("Login failed");
+		}
+	};
+
 	return (
-		<form className={cn("flex flex-col gap-6", className)} {...props}>
+		<form
+			className={cn("flex flex-col gap-6", className)}
+			onSubmit={handleSubmit}
+			{...props}
+		>
 			<FieldGroup>
 				<div className="flex flex-col items-center gap-1 text-center">
 					<h1 className="text-2xl font-bold">Login to your account</h1>
@@ -24,31 +53,43 @@ export function LoginForm({
 				</div>
 				<Field>
 					<FieldLabel htmlFor="email">Email</FieldLabel>
-					<Input id="email" type="email" placeholder="m@example.com" required />
+					<Input
+						id="email"
+						type="email"
+						placeholder="m@example.com"
+						required
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+					/>
 				</Field>
 				<Field>
 					<div className="flex items-center">
 						<FieldLabel htmlFor="password">Password</FieldLabel>
-						<a
-							href="/forgot-password"
-							className="ml-auto text-sm underline-offset-4 hover:underline"
-						>
-							Forgot your password?
-						</a>
 					</div>
-					<Input id="password" type="password" required />
+					<Input
+						id="password"
+						type="password"
+						required
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+					/>
 				</Field>
 				<Field>
 					<Button type="submit">Login</Button>
 				</Field>
 				<FieldSeparator>Or continue with</FieldSeparator>
 				<Field>
-					<Button variant="outline" type="button">
+					<Button
+						variant="outline"
+						type="button"
+						onClick={() => signIn("github")}
+					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 24 24"
 							role="img"
 							aria-labelledby="githubIconTitle"
+							className="mr-2 size-4"
 						>
 							<title id="githubIconTitle">GitHub</title>
 							<path

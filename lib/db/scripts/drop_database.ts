@@ -1,7 +1,9 @@
 import db from "../_index";
 
-function dropDatabase() {
-	db.execute(`DROP TABLE IF EXISTS "users";`);
+async function dropDatabase() {
+	await db.execute(`DROP TABLE IF EXISTS "users";`);
+	await db.execute(`DROP TABLE IF EXISTS "drizzle_migrations";`);
+	process.exit(0);
 }
 
 dropDatabase();

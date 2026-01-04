@@ -12,8 +12,8 @@ export const usersTable = pgTable(
 			cache: 1,
 		}),
 		name: varchar({ length: 255 }).notNull(),
-		age: integer().notNull(),
 		email: varchar({ length: 255 }).notNull(),
+		password: varchar({ length: 255 }).notNull(),
 	},
 	(table) => [unique("users_email_unique").on(table.email)],
 );
