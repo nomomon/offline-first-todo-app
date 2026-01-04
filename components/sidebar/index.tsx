@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, Calendar1, CalendarDays } from "lucide-react";
+import { Archive, Calendar1, CalendarDays, Inbox } from "lucide-react";
 import Link from "next/link";
 import type * as React from "react";
 import { AppLogo } from "@/components/sidebar/app-logo";
@@ -21,6 +21,11 @@ import { AddTaskButton } from "./add-task";
 // This is sample data.
 const data = {
 	navItems: [
+		{
+			title: "Inbox",
+			url: "/inbox",
+			icon: Inbox,
+		},
 		{
 			title: "Today",
 			url: "/",
