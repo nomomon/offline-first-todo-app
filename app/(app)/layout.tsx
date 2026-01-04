@@ -5,7 +5,11 @@ import {
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-export default function Page() {
+export default function AppLayout({
+	children,
+}: Readonly<{
+	children: React.ReactNode;
+}>) {
 	return (
 		<SidebarProvider>
 			<AppSidebar />
@@ -15,7 +19,7 @@ export default function Page() {
 						<SidebarTrigger />
 					</div>
 				</header>
-				<main className="flex-1 p-4">Main Content Area</main>
+				<main className="flex-1 p-4">{children}</main>
 			</SidebarInset>
 		</SidebarProvider>
 	);
