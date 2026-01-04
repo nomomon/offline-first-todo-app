@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -33,8 +34,9 @@ export function LoginForm({
 		if (result?.ok) {
 			router.push("/");
 		} else {
-			// Handle error
-			console.error("Login failed");
+			toast.error("Invalid email or password", {
+				description: "Please check your credentials and try again.",
+			});
 		}
 	};
 
