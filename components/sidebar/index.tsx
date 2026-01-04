@@ -1,6 +1,7 @@
 "use client";
 
 import { Archive, Calendar1, CalendarDays } from "lucide-react";
+import Link from "next/link";
 import type * as React from "react";
 import { AppLogo } from "@/components/sidebar/app-logo";
 import { NavUser } from "@/components/sidebar/nav-user";
@@ -22,17 +23,17 @@ const data = {
 	navItems: [
 		{
 			title: "Today",
-			url: "#",
+			url: "/",
 			icon: Calendar1,
 		},
 		{
 			title: "Future",
-			url: "#",
+			url: "/upcoming",
 			icon: CalendarDays,
 		},
 		{
 			title: "Archive",
-			url: "#",
+			url: "/completed",
 			icon: Archive,
 		},
 	],
@@ -52,9 +53,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					<SidebarMenu>
 						{data.navItems.map((item) => (
 							<SidebarMenuItem key={item.title}>
-								<SidebarMenuButton tooltip={item.title}>
-									{item.icon && <item.icon />}
-									<span>{item.title}</span>
+								<SidebarMenuButton asChild tooltip={item.title}>
+									<Link href={item.url}>
+										{item.icon && <item.icon />}
+										<span>{item.title}</span>
+									</Link>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 						))}
