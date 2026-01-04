@@ -27,3 +27,8 @@ One also might ask, why not a mobile app? Which is a valid question, considering
 - I'm really well versed with React, and not bound to make native, so why not just stick to what I'm good at? 
 
 ## Building the App
+
+My stack:
+- Next.JS (tailwindcss, typescript)
+- Biome (linting, formatting)
+- Shadcn UI (components)
