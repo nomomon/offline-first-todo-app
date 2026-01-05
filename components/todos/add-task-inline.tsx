@@ -1,13 +1,14 @@
 "use client";
 
 import { format } from "date-fns";
-import { Calendar, Clock, Flag, Plus } from "lucide-react";
+import { Calendar, Clock, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateTodo } from "@/lib/backend/todos";
 import { cn } from "@/lib/utils";
+import { PrioritySelect } from "./priority-select";
 import { SmartDatePicker } from "./smart-date-picker";
 
 export function AddTaskInline() {
@@ -15,6 +16,7 @@ export function AddTaskInline() {
 	const [content, setContent] = useState("");
 	const [description, setDescription] = useState("");
 	const [date, setDate] = useState<Date | undefined>();
+	const [priority, setPriority] = useState(4);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const createTodo = useCreateTodo();
 
@@ -22,6 +24,7 @@ export function AddTaskInline() {
 		setContent("");
 		setDescription("");
 		setDate(undefined);
+		setPriority(4);
 	};
 
 	const exitEditing = () => {
@@ -46,6 +49,7 @@ export function AddTaskInline() {
 				description: description.trim() || undefined,
 				dueDate: date ? format(date, "yyyy-MM-dd") : undefined,
 				isCompleted: false,
+				priority,
 			},
 			{
 				onSuccess: () => {
@@ -114,14 +118,11 @@ export function AddTaskInline() {
 							</Button>
 						</SmartDatePicker>
 
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							className="h-7 px-2 rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50"
-						>
-							<Flag className="w-4 h-4" />
-						</Button>
+						<PrioritySelect
+							value={priority}
+							onChange={setPriority}
+							triggerClassName="h-7 px-2 rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50"
+						/>
 						<Button
 							type="button"
 							variant="outline"

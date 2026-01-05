@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { Flag, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -21,14 +21,9 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { PrioritySelect } from "./priority-select";
 
 const todoFormSchema = z.object({
 	content: z.string().min(1, "Content is required"),
@@ -155,48 +150,7 @@ export function TodoForm({
 							control={form.control}
 							name="priority"
 							render={({ field }) => (
-								<Select
-									onValueChange={(value) => field.onChange(Number(value))}
-									value={String(field.value)}
-								>
-									<SelectTrigger className="h-8 w-auto border shadow-sm px-3 gap-2 focus:ring-0">
-										<Flag
-											className={cn("h-3 w-3", {
-												"text-red-500 fill-red-500": field.value === 1,
-												"text-yellow-500 fill-yellow-500": field.value === 2,
-												"text-blue-500 fill-blue-500": field.value === 3,
-												"text-muted-foreground": field.value === 4,
-											})}
-										/>
-										<span className="text-xs">Priority {field.value}</span>
-									</SelectTrigger>
-									<SelectContent align="start">
-										<SelectItem value="1">
-											<div className="flex items-center gap-2">
-												<Flag className="h-3 w-3 text-red-500 fill-red-500" />
-												<span>Priority 1</span>
-											</div>
-										</SelectItem>
-										<SelectItem value="2">
-											<div className="flex items-center gap-2">
-												<Flag className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-												<span>Priority 2</span>
-											</div>
-										</SelectItem>
-										<SelectItem value="3">
-											<div className="flex items-center gap-2">
-												<Flag className="h-3 w-3 text-blue-500 fill-blue-500" />
-												<span>Priority 3</span>
-											</div>
-										</SelectItem>
-										<SelectItem value="4">
-											<div className="flex items-center gap-2">
-												<Flag className="h-3 w-3 text-muted-foreground" />
-												<span>Priority 4</span>
-											</div>
-										</SelectItem>
-									</SelectContent>
-								</Select>
+								<PrioritySelect value={field.value} onChange={field.onChange} />
 							)}
 						/>
 					</div>
