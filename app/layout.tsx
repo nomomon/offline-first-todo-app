@@ -16,10 +16,11 @@ const geistMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
-const APP_NAME = "PWA App";
-const APP_DEFAULT_TITLE = "My Awesome PWA App";
-const APP_TITLE_TEMPLATE = "%s - PWA App";
-const APP_DESCRIPTION = "Best PWA app in the world!";
+const APP_NAME = "Offline First Todo";
+const APP_DEFAULT_TITLE = "Offline First Todo | Works without internet";
+const APP_TITLE_TEMPLATE = "%s | Offline First Todo";
+const APP_DESCRIPTION =
+	"Offline-capable task manager for teams in low-connectivity environments. Caches the UI, server data, and requests so work continues without internet.";
 
 export const metadata: Metadata = {
 	applicationName: APP_NAME,
@@ -28,6 +29,17 @@ export const metadata: Metadata = {
 		template: APP_TITLE_TEMPLATE,
 	},
 	description: APP_DESCRIPTION,
+	keywords: [
+		"offline first",
+		"todo app",
+		"pwa",
+		"task manager",
+		"tanstack query",
+		"serwist",
+		"warehouse operations",
+	],
+	category: "productivity",
+	manifest: "/manifest.json",
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "default",
@@ -57,7 +69,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-	themeColor: "#FFFFFF",
+	themeColor: [
+		{ media: "(prefers-color-scheme: light)", color: "#f7f5f2" },
+		{ media: "(prefers-color-scheme: dark)", color: "#1f1a18" },
+	],
 };
 
 export default function RootLayout({
