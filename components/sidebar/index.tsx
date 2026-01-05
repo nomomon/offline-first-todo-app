@@ -38,28 +38,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		navItems: [
 			{
 				title: "Inbox",
-				url: "/inbox",
+				url: "/?view=inbox",
 				icon: Inbox,
 				count: counts?.inbox ?? 0,
 				view: "inbox" as TodoFilter,
 			},
 			{
 				title: "Today",
-				url: "/",
+				url: "/?view=today",
 				icon: Calendar1,
 				count: counts?.today ?? 0,
 				view: "today" as TodoFilter,
 			},
 			{
 				title: "Future",
-				url: "/upcoming",
+				url: "/?view=upcoming",
 				icon: CalendarDays,
 				count: counts?.upcoming ?? 0,
 				view: "upcoming" as TodoFilter,
 			},
 			{
 				title: "Archive",
-				url: "/completed",
+				url: "/?view=completed",
 				icon: Archive,
 				count: counts?.completed ?? 0,
 				view: "completed" as TodoFilter,
