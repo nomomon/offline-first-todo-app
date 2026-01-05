@@ -107,26 +107,6 @@ const serwist = new Serwist({
 				},
 			}),
 		},
-
-		// 5) General API GET requests
-		{
-			matcher: ({ url, sameOrigin, request }) =>
-				sameOrigin &&
-				url.pathname.startsWith("/api/") &&
-				request.method === "GET",
-			handler: new NetworkFirst({
-				cacheName: "api-data",
-				plugins: [
-					new ExpirationPlugin({
-						maxEntries: 50,
-						maxAgeSeconds: SW_CACHE_TIME_ONE_DAY_S, // 1 day
-					}),
-				],
-				matchOptions: {
-					ignoreVary: true,
-				},
-			}),
-		},
 	],
 });
 
