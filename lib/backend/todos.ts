@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { toast } from "sonner";
 import type { TodoFilter } from "../db/queries/todos";
 import type { todosTable } from "../db/schema";
 
@@ -36,6 +37,10 @@ export function useCreateTodo() {
 		mutationFn: call,
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["todos"] });
+			toast.success("Todo created");
+		},
+		onError: () => {
+			toast.error("Failed to create todo");
 		},
 	});
 }
@@ -52,6 +57,10 @@ export function useUpdateTodo() {
 		mutationFn: call,
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["todos"] });
+			toast.success("Todo updated");
+		},
+		onError: () => {
+			toast.error("Failed to update todo");
 		},
 	});
 }
@@ -68,6 +77,10 @@ export function useDeleteTodo() {
 		mutationFn: call,
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["todos"] });
+			toast.success("Todo deleted");
+		},
+		onError: () => {
+			toast.error("Failed to delete todo");
 		},
 	});
 }
