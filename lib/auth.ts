@@ -1,4 +1,5 @@
-import { compare } from "bcryptjs";
+import { compare, hash } from "bcryptjs";
+import { randomUUID } from "crypto";
 import { eq } from "drizzle-orm";
 import { getServerSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -55,6 +56,46 @@ export const authOptions: NextAuthOptions = {
 	],
 	pages: {
 		signIn: "/login",
+	},
+	callbacks: {
+		async signIn({ user, account, profile }) {
+			if (account?.provider !== "github") {
+				return true;
+			}
+
+			const email = user.email || (profile as { email?: string } | null)?.email;
+			if (!email) {
+				return false;
+			}
+
+			const existing = await db
+				.select()
+				.from(usersTable)
+				.where(eq(usersTable.email, email))
+				.limit(1);
+
+			if (existing.length > 0) {
+				return true;
+			}
+
+			const placeholderPassword = await hash(randomUUID(), 10);
+
+			try {
+				await db.insert(usersTable).values({
+					name:
+						user.name ||
+						(profile as { name?: string } | null)?.name ||
+						"GitHub User",
+					email,
+					password: placeholderPassword,
+				});
+			} catch (error) {
+				// Ignore unique constraint races; sign-in can still continue if another request just created the row.
+				console.error("GitHub sign-in user create error", error);
+			}
+
+			return true;
+		},
 	},
 };
 
