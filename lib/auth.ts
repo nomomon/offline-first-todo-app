@@ -1,5 +1,5 @@
+import { randomUUID } from "node:crypto";
 import { compare, hash } from "bcryptjs";
-import { randomUUID } from "crypto";
 import { eq } from "drizzle-orm";
 import { getServerSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
