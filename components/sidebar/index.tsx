@@ -17,6 +17,7 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarRail,
+	useSidebar,
 } from "@/components/ui/sidebar";
 import { fetchTodos, useTodoCounts } from "@/lib/backend/todos";
 import type { TodoFilter } from "@/lib/db/queries/todos";
@@ -24,8 +25,15 @@ import { AddTaskButton } from "./add-task";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const queryClient = useQueryClient();
+	const { isMobile, setOpenMobile } = useSidebar();
 
 	const { data: counts } = useTodoCounts();
+
+	const closeOnMobile = () => {
+		if (isMobile) {
+			setOpenMobile(false);
+		}
+	};
 
 	const prefetchTodos = (view: TodoFilter) => {
 		queryClient.prefetchQuery({
@@ -83,6 +91,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 								<SidebarMenuButton
 									asChild
 									tooltip={item.title}
+									onClick={closeOnMobile}
 									onMouseEnter={() => prefetchTodos(item.view)}
 								>
 									<Link href={item.url}>
