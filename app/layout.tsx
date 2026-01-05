@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { AuthProvider } from "@/components/providers/session-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -65,16 +66,18 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" dir="ltr">
+		<html lang="en" dir="ltr" suppressHydrationWarning>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<AuthProvider>
-					<QueryProvider>
-						{children}
-						<Toaster />
-					</QueryProvider>
-				</AuthProvider>
+				<ThemeProvider>
+					<AuthProvider>
+						<QueryProvider>
+							{children}
+							<Toaster />
+						</QueryProvider>
+					</AuthProvider>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

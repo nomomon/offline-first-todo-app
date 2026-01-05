@@ -1,12 +1,17 @@
 "use client";
 
-import { ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, Laptop, LogOut, Moon, Sun } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -18,12 +23,15 @@ import {
 
 export function NavUser() {
 	const { data } = useSession();
+	const { theme, resolvedTheme, setTheme } = useTheme();
 	const { isMobile } = useSidebar();
 
 	if (!data?.user) {
 		return null;
 	}
 	const user = data.user;
+	const currentTheme =
+		theme === "system" ? "system" : (resolvedTheme ?? theme ?? "system");
 
 	return (
 		<SidebarMenu>
@@ -53,6 +61,25 @@ export function NavUser() {
 						align="end"
 						sideOffset={4}
 					>
+						<DropdownMenuLabel>Appearance</DropdownMenuLabel>
+						<DropdownMenuRadioGroup
+							value={currentTheme}
+							onValueChange={setTheme}
+						>
+							<DropdownMenuRadioItem value="light">
+								<Sun />
+								Light
+							</DropdownMenuRadioItem>
+							<DropdownMenuRadioItem value="dark">
+								<Moon />
+								Dark
+							</DropdownMenuRadioItem>
+							<DropdownMenuRadioItem value="system">
+								<Laptop />
+								System
+							</DropdownMenuRadioItem>
+						</DropdownMenuRadioGroup>
+						<DropdownMenuSeparator />
 						<DropdownMenuItem onClick={() => signOut()}>
 							<LogOut />
 							Log out
