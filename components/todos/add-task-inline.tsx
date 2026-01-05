@@ -18,6 +18,17 @@ export function AddTaskInline() {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const createTodo = useCreateTodo();
 
+	const resetForm = () => {
+		setContent("");
+		setDescription("");
+		setDate(undefined);
+	};
+
+	const exitEditing = () => {
+		resetForm();
+		setIsEditing(false);
+	};
+
 	useEffect(() => {
 		if (isEditing && inputRef.current) {
 			inputRef.current.focus();
@@ -26,20 +37,19 @@ export function AddTaskInline() {
 
 	const handleSubmit = (e?: React.FormEvent) => {
 		e?.preventDefault();
-		if (!content.trim()) return;
+		const trimmedContent = content.trim();
+		if (!trimmedContent) return;
 
 		createTodo.mutate(
 			{
-				content: content,
-				description: description || undefined,
-				dueDate: date ? date.toISOString() : undefined,
+				content: trimmedContent,
+				description: description.trim() || undefined,
+				dueDate: date ? format(date, "yyyy-MM-dd") : undefined,
 				isCompleted: false,
 			},
 			{
 				onSuccess: () => {
-					setContent("");
-					setDescription("");
-					setDate(undefined);
+					resetForm();
 					// Keep isEditing true to allow adding multiple tasks
 					inputRef.current?.focus();
 				},
@@ -49,10 +59,7 @@ export function AddTaskInline() {
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === "Escape") {
-			setIsEditing(false);
-			setContent("");
-			setDescription("");
-			setDate(undefined);
+			exitEditing();
 		}
 	};
 
@@ -85,6 +92,7 @@ export function AddTaskInline() {
 				<Textarea
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
+					onKeyDown={handleKeyDown}
 					placeholder="Description"
 					className="text-sm text-gray-600 placeholder:text-gray-400 border-none focus-visible:ring-0 p-0 resize-none min-h-[20px] shadow-none"
 				/>
@@ -127,7 +135,7 @@ export function AddTaskInline() {
 						<Button
 							type="button"
 							variant="ghost"
-							onClick={() => setIsEditing(false)}
+							onClick={exitEditing}
 							className="h-8 text-gray-500 hover:bg-gray-100"
 						>
 							Cancel
