@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { EditTodoDialog } from "./edit-todo-dialog";
+import { getPriorityStyle } from "./priority-select";
 
 interface TodoItemProps {
 	todo: Todo;
@@ -32,6 +33,8 @@ export function TodoItem({ todo }: TodoItemProps) {
 
 	const isOverdue =
 		todo.dueDate && new Date(todo.dueDate) < new Date() && !todo.isCompleted;
+	const priorityStyle = getPriorityStyle(todo.priority);
+	const checkboxPriorityClasses = priorityStyle.checkbox;
 
 	return (
 		<>
@@ -43,7 +46,11 @@ export function TodoItem({ todo }: TodoItemProps) {
 					<Checkbox
 						checked={todo.isCompleted}
 						onCheckedChange={toggleCompleted}
-						className="rounded-full w-5 h-5 border-gray-300 data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all hover:border-primary"
+						className={cn(
+							"rounded-full w-5 h-5 transition-all",
+							checkboxPriorityClasses.base,
+							checkboxPriorityClasses.checked,
+						)}
 					/>
 				</div>
 				<div className="flex-1 min-w-0 flex flex-col gap-1">
