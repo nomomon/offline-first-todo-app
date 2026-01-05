@@ -83,7 +83,7 @@ export function AddTaskInline() {
 	}
 
 	return (
-		<div className="border border-gray-200 rounded-xl p-4 shadow-sm bg-white animate-in fade-in zoom-in-95 duration-200">
+		<div className="border border-border rounded-xl p-4 shadow-sm bg-card text-card-foreground animate-in fade-in zoom-in-95 duration-200">
 			<form onSubmit={handleSubmit} className="flex flex-col gap-2">
 				<Input
 					ref={inputRef}
@@ -91,17 +91,17 @@ export function AddTaskInline() {
 					onChange={(e) => setContent(e.target.value)}
 					onKeyDown={handleKeyDown}
 					placeholder="Task name"
-					className="text-base font-medium placeholder:text-gray-400 border-none focus-visible:ring-0 p-0 shadow-none"
+					className="text-base font-medium text-foreground placeholder:text-muted-foreground border-none focus-visible:ring-0 p-0 shadow-none"
 				/>
 				<Textarea
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
 					onKeyDown={handleKeyDown}
 					placeholder="Description"
-					className="text-sm text-gray-600 placeholder:text-gray-400 border-none focus-visible:ring-0 p-0 resize-none min-h-[20px] shadow-none"
+					className="text-sm text-foreground/80 placeholder:text-muted-foreground border-none focus-visible:ring-0 p-0 resize-none min-h-[20px] shadow-none"
 				/>
 
-				<div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-2">
+				<div className="flex items-center justify-between pt-2 border-t border-border mt-2">
 					<div className="flex items-center gap-2">
 						<SmartDatePicker date={date} setDate={setDate}>
 							<Button
@@ -109,7 +109,7 @@ export function AddTaskInline() {
 								variant="outline"
 								size="sm"
 								className={cn(
-									"h-7 px-2 rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50",
+									"h-7 px-2 rounded-md text-muted-foreground border-border hover:text-foreground hover:bg-muted/60",
 									date && "text-primary border-primary/20 bg-primary/5",
 								)}
 							>
@@ -121,7 +121,7 @@ export function AddTaskInline() {
 						<PrioritySelect
 							value={priority}
 							onChange={setPriority}
-							triggerClassName="h-7! px-2! font-medium rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50"
+							triggerClassName="h-7! px-2! font-medium rounded-md text-muted-foreground border-border hover:text-foreground hover:bg-muted/60"
 						/>
 					</div>
 					<div className="flex items-center gap-2">
@@ -129,14 +129,14 @@ export function AddTaskInline() {
 							type="button"
 							variant="ghost"
 							onClick={exitEditing}
-							className="h-8 text-gray-500 hover:bg-gray-100"
+							className="h-8 text-muted-foreground hover:bg-muted/70"
 						>
 							Cancel
 						</Button>
 						<Button
 							type="submit"
 							disabled={!content.trim() || createTodo.isPending}
-							className="h-8 bg-[#db4c3f] hover:bg-[#db4c3f]/90 text-white font-medium px-4"
+							className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4"
 						>
 							Add task
 						</Button>

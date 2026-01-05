@@ -39,7 +39,7 @@ export function TodoItem({ todo }: TodoItemProps) {
 	return (
 		<>
 			<div
-				className="group flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 cursor-pointer"
+				className="group flex items-start gap-3 py-3 border-b border-border last:border-0 cursor-pointer"
 				onClick={() => setIsEditing(true)}
 			>
 				<div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
@@ -56,8 +56,8 @@ export function TodoItem({ todo }: TodoItemProps) {
 				<div className="flex-1 min-w-0 flex flex-col gap-1">
 					<span
 						className={cn(
-							"text-sm font-medium text-gray-900 leading-tight transition-all",
-							todo.isCompleted && "line-through text-gray-500",
+							"text-sm font-medium text-foreground leading-tight transition-all",
+							todo.isCompleted && "line-through text-muted-foreground",
 						)}
 					>
 						{todo.content}
@@ -68,8 +68,8 @@ export function TodoItem({ todo }: TodoItemProps) {
 							{todo.description && (
 								<span
 									className={cn(
-										"text-xs text-gray-500 line-clamp-2",
-										todo.isCompleted && "text-gray-400",
+										"text-xs text-muted-foreground line-clamp-2",
+										todo.isCompleted && "text-muted-foreground/80",
 									)}
 								>
 									{todo.description}
@@ -80,8 +80,8 @@ export function TodoItem({ todo }: TodoItemProps) {
 								<span
 									className={cn(
 										"flex items-center gap-1 text-xs",
-										isOverdue ? "text-destructive" : "text-gray-500",
-										todo.isCompleted && "text-gray-400",
+										isOverdue ? "text-destructive" : "text-muted-foreground",
+										todo.isCompleted && "text-muted-foreground/80",
 									)}
 								>
 									<Calendar className="w-3 h-3" />
@@ -99,7 +99,7 @@ export function TodoItem({ todo }: TodoItemProps) {
 					variant="ghost"
 					size="icon"
 					onClick={handleDelete}
-					className="opacity-0 group-hover:opacity-100 h-8 w-8 text-gray-400 hover:text-destructive transition-opacity"
+					className="opacity-0 group-hover:opacity-100 h-8 w-8 text-muted-foreground hover:text-destructive transition-opacity"
 				>
 					<Trash2 className="h-4 w-4" />
 				</Button>

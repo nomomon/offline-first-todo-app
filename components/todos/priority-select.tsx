@@ -14,38 +14,38 @@ import { cn } from "@/lib/utils";
 export const PRIORITY_STYLES = {
 	1: {
 		label: "Priority 1",
-		icon: "text-red-500 fill-red-500",
+		icon: "text-[var(--priority-1)] fill-[var(--priority-1)]",
 		checkbox: {
-			base: "bg-red-500/20 border-red-500/40 text-red-500/80 hover:border-red-500/60",
+			base: "bg-[var(--priority-1-surface)] border-[var(--priority-1-border)] text-[var(--priority-1)] hover:border-[var(--priority-1)]",
 			checked:
-				"data-[state=checked]:bg-red-500 data-[state=checked]:border-red-500 data-[state=checked]:text-white",
+				"data-[state=checked]:bg-[var(--priority-1)] data-[state=checked]:border-[var(--priority-1)] data-[state=checked]:text-[var(--priority-contrast)]",
 		},
 	},
 	2: {
 		label: "Priority 2",
-		icon: "text-yellow-500 fill-yellow-500",
+		icon: "text-[var(--priority-2)] fill-[var(--priority-2)]",
 		checkbox: {
-			base: "bg-yellow-500/20 border-yellow-500/40 text-yellow-600/80 hover:border-yellow-500/60",
+			base: "bg-[var(--priority-2-surface)] border-[var(--priority-2-border)] text-[var(--priority-2)] hover:border-[var(--priority-2)]",
 			checked:
-				"data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500 data-[state=checked]:text-white",
+				"data-[state=checked]:bg-[var(--priority-2)] data-[state=checked]:border-[var(--priority-2)] data-[state=checked]:text-[var(--priority-contrast)]",
 		},
 	},
 	3: {
 		label: "Priority 3",
-		icon: "text-blue-500 fill-blue-500",
+		icon: "text-[var(--priority-3)] fill-[var(--priority-3)]",
 		checkbox: {
-			base: "bg-blue-500/20 border-blue-500/40 text-blue-500/80 hover:border-blue-500/60",
+			base: "bg-[var(--priority-3-surface)] border-[var(--priority-3-border)] text-[var(--priority-3)] hover:border-[var(--priority-3)]",
 			checked:
-				"data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 data-[state=checked]:text-white",
+				"data-[state=checked]:bg-[var(--priority-3)] data-[state=checked]:border-[var(--priority-3)] data-[state=checked]:text-[var(--priority-contrast)]",
 		},
 	},
 	4: {
 		label: "Priority 4",
-		icon: "text-muted-foreground",
+		icon: "text-[var(--priority-4)] fill-[var(--priority-4)]",
 		checkbox: {
-			base: "bg-muted-foreground/20 border-muted-foreground/40 text-muted-foreground/80 hover:border-muted-foreground/60",
+			base: "bg-[var(--priority-4-surface)] border-[var(--priority-4-border)] text-[var(--priority-4)] hover:border-[var(--priority-4)]",
 			checked:
-				"data-[state=checked]:bg-muted-foreground data-[state=checked]:border-muted-foreground data-[state=checked]:text-white",
+				"data-[state=checked]:bg-[var(--priority-4)] data-[state=checked]:border-[var(--priority-4)] data-[state=checked]:text-[var(--priority-contrast)]",
 		},
 	},
 } as const;
