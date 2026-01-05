@@ -101,8 +101,8 @@ export function AddTaskInline() {
 					className="text-sm text-foreground/80 placeholder:text-muted-foreground border-none focus-visible:ring-0 p-0 resize-none min-h-[20px] shadow-none"
 				/>
 
-				<div className="flex items-center justify-between pt-2 border-t border-border mt-2">
-					<div className="flex items-center gap-2">
+				<div className="flex flex-col gap-3 pt-2 mt-2 border-t border-border sm:flex-row sm:items-center sm:justify-between">
+					<div className="flex flex-wrap items-center gap-2">
 						<SmartDatePicker date={date} setDate={setDate}>
 							<Button
 								type="button"
@@ -124,19 +124,19 @@ export function AddTaskInline() {
 							triggerClassName="h-7! px-2! font-medium rounded-md text-muted-foreground border-border hover:text-foreground hover:bg-muted/60"
 						/>
 					</div>
-					<div className="flex items-center gap-2">
+					<div className="flex flex-col-reverse w-full gap-2 sm:w-auto sm:flex-row sm:items-center">
 						<Button
 							type="button"
 							variant="ghost"
 							onClick={exitEditing}
-							className="h-8 text-muted-foreground hover:bg-muted/70"
+							className="h-8 w-full text-muted-foreground hover:bg-muted/70 sm:w-auto"
 						>
 							Cancel
 						</Button>
 						<Button
 							type="submit"
 							disabled={!content.trim() || createTodo.isPending}
-							className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4"
+							className="h-8 w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4 sm:w-auto"
 						>
 							Add task
 						</Button>
