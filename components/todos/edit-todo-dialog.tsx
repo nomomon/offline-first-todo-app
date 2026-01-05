@@ -59,6 +59,7 @@ export function EditTodoDialog({
 							priority: todo.priority,
 						}}
 						onSubmit={handleSubmit}
+						onCancel={() => onOpenChange(false)}
 						submitLabel="Save Changes"
 					/>
 				</div>

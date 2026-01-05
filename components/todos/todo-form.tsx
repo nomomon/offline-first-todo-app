@@ -43,12 +43,14 @@ interface TodoFormProps {
 	defaultValues?: Partial<TodoFormValues>;
 	onSubmit: (values: TodoFormValues) => void;
 	submitLabel?: string;
+	onCancel?: () => void;
 }
 
 export function TodoForm({
 	defaultValues,
 	onSubmit,
 	submitLabel = "Save",
+	onCancel,
 }: TodoFormProps) {
 	const form = useForm<TodoFormValues>({
 		resolver: zodResolver(todoFormSchema),
@@ -59,6 +61,11 @@ export function TodoForm({
 			...defaultValues,
 		},
 	});
+
+	const handleCancel = () => {
+		form.reset();
+		onCancel?.();
+	};
 
 	return (
 		<Form {...form}>
@@ -150,7 +157,7 @@ export function TodoForm({
 							render={({ field }) => (
 								<Select
 									onValueChange={(value) => field.onChange(Number(value))}
-									defaultValue={String(field.value)}
+									value={String(field.value)}
 								>
 									<SelectTrigger className="h-8 w-auto border shadow-sm px-3 gap-2 focus:ring-0">
 										<Flag
@@ -196,7 +203,7 @@ export function TodoForm({
 				</div>
 
 				<div className="flex justify-end gap-2 pt-6 border-t mt-6">
-					<Button type="button" variant="secondary" onClick={() => {}}>
+					<Button type="button" variant="secondary" onClick={handleCancel}>
 						Cancel
 					</Button>
 					<Button type="submit">{submitLabel}</Button>

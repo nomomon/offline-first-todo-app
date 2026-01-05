@@ -51,7 +51,11 @@ export function CreateTodoDialog({ children }: CreateTodoDialogProps) {
 					</DialogDescription>
 				</DialogHeader>
 				<div className="p-6 overflow-y-auto">
-					<TodoForm onSubmit={handleSubmit} submitLabel="Add Task" />
+					<TodoForm
+						onSubmit={handleSubmit}
+						onCancel={() => setOpen(false)}
+						submitLabel="Add Task"
+					/>
 				</div>
 			</DialogContent>
 		</Dialog>
