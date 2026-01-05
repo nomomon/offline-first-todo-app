@@ -18,7 +18,7 @@ export const PRIORITY_STYLES = {
 		checkbox: {
 			base: "bg-[var(--priority-1-surface)] border-[var(--priority-1-border)] text-[var(--priority-1)] hover:border-[var(--priority-1)]",
 			checked:
-				"data-[state=checked]:bg-[var(--priority-1)] data-[state=checked]:border-[var(--priority-1)] data-[state=checked]:text-[var(--priority-contrast)]",
+				"data-[state=checked]:bg-[var(--priority-1)]! data-[state=checked]:border-[var(--priority-1)]! data-[state=checked]:text-[var(--priority-contrast)]!",
 		},
 	},
 	2: {
@@ -27,7 +27,7 @@ export const PRIORITY_STYLES = {
 		checkbox: {
 			base: "bg-[var(--priority-2-surface)] border-[var(--priority-2-border)] text-[var(--priority-2)] hover:border-[var(--priority-2)]",
 			checked:
-				"data-[state=checked]:bg-[var(--priority-2)] data-[state=checked]:border-[var(--priority-2)] data-[state=checked]:text-[var(--priority-contrast)]",
+				"data-[state=checked]:bg-[var(--priority-2)]! data-[state=checked]:border-[var(--priority-2)]! data-[state=checked]:text-[var(--priority-contrast)]!",
 		},
 	},
 	3: {
@@ -36,7 +36,7 @@ export const PRIORITY_STYLES = {
 		checkbox: {
 			base: "bg-[var(--priority-3-surface)] border-[var(--priority-3-border)] text-[var(--priority-3)] hover:border-[var(--priority-3)]",
 			checked:
-				"data-[state=checked]:bg-[var(--priority-3)] data-[state=checked]:border-[var(--priority-3)] data-[state=checked]:text-[var(--priority-contrast)]",
+				"data-[state=checked]:bg-[var(--priority-3)]! data-[state=checked]:border-[var(--priority-3)]! data-[state=checked]:text-[var(--priority-contrast)]!",
 		},
 	},
 	4: {
@@ -45,7 +45,7 @@ export const PRIORITY_STYLES = {
 		checkbox: {
 			base: "bg-[var(--priority-4-surface)] border-[var(--priority-4-border)] text-[var(--priority-4)] hover:border-[var(--priority-4)]",
 			checked:
-				"data-[state=checked]:bg-[var(--priority-4)] data-[state=checked]:border-[var(--priority-4)] data-[state=checked]:text-[var(--priority-contrast)]",
+				"data-[state=checked]:bg-[var(--priority-4)]! data-[state=checked]:border-[var(--priority-4)]! data-[state=checked]:text-[var(--priority-contrast)]!",
 		},
 	},
 } as const;
