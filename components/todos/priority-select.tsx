@@ -74,12 +74,13 @@ export function PrioritySelect({
 			onValueChange={(val) => onChange(Number(val))}
 		>
 			<SelectTrigger
+				size="sm"
 				className={cn(
 					"h-8 w-auto border shadow-sm px-3 gap-2 focus:ring-0",
 					triggerClassName,
 				)}
 			>
-				<SelectValue placeholder={placeholder} className="hidden" />
+				<SelectValue placeholder={placeholder} />
 			</SelectTrigger>
 			<SelectContent align="start">
 				{Object.entries(PRIORITY_STYLES).map(([priority, option]) => (

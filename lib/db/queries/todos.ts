@@ -1,4 +1,14 @@
-import { and, count, desc, eq, gt, isNull, lte, type SQL } from "drizzle-orm";
+import {
+	and,
+	asc,
+	count,
+	desc,
+	eq,
+	gt,
+	isNull,
+	lte,
+	type SQL,
+} from "drizzle-orm";
 import db from "..";
 import { todosTable } from "../schema";
 
@@ -79,7 +89,12 @@ export async function getTodos(userId: number, filter?: TodoFilter) {
 		.select()
 		.from(todosTable)
 		.where(and(...conditions))
-		.orderBy(desc(todosTable.createdAt));
+		.orderBy(
+			asc(todosTable.isCompleted),
+			asc(todosTable.dueDate),
+			asc(todosTable.priority),
+			desc(todosTable.createdAt),
+		);
 }
 
 export async function addTodo(todo: typeof todosTable.$inferInsert) {

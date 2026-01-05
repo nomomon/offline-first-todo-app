@@ -2,12 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { Plus } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
 	Form,
 	FormControl,
@@ -16,14 +15,10 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { PrioritySelect } from "./priority-select";
+import { SmartDatePicker } from "./smart-date-picker";
 
 const todoFormSchema = z.object({
 	content: z.string().min(1, "Content is required"),
@@ -111,38 +106,21 @@ export function TodoForm({
 							control={form.control}
 							name="dueDate"
 							render={({ field }) => (
-								<Popover>
-									<PopoverTrigger asChild>
-										<Button
-											variant="outline"
-											size="sm"
-											className={cn(
-												"h-8 px-3 text-xs font-normal",
-												!field.value && "text-muted-foreground",
-											)}
-										>
-											{field.value ? (
-												format(field.value, "MMM d")
-											) : (
-												<>
-													<Plus className="mr-2 h-3 w-3" />
-													Due Date
-												</>
-											)}
-										</Button>
-									</PopoverTrigger>
-									<PopoverContent className="w-auto p-0" align="start">
-										<Calendar
-											mode="single"
-											selected={field.value}
-											onSelect={field.onChange}
-											disabled={(date) =>
-												date < new Date(new Date().setHours(0, 0, 0, 0))
-											}
-											initialFocus
-										/>
-									</PopoverContent>
-								</Popover>
+								<SmartDatePicker date={field.value} setDate={field.onChange}>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										className={cn(
+											"h-7 px-2 rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50",
+											field.value &&
+												"text-primary border-primary/20 bg-primary/5",
+										)}
+									>
+										<Calendar className="w-4 h-4 mr-1" />
+										{field.value ? format(field.value, "MMM d") : "Date"}
+									</Button>
+								</SmartDatePicker>
 							)}
 						/>
 
@@ -150,7 +128,11 @@ export function TodoForm({
 							control={form.control}
 							name="priority"
 							render={({ field }) => (
-								<PrioritySelect value={field.value} onChange={field.onChange} />
+								<PrioritySelect
+									value={field.value}
+									onChange={field.onChange}
+									triggerClassName="h-7! px-2! font-medium rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50"
+								/>
 							)}
 						/>
 					</div>

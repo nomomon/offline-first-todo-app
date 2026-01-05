@@ -26,6 +26,32 @@ const normalizeDate = (value?: Date | string | null): string | null => {
 	return typeof value === "string" ? value : value.toISOString().split("T")[0];
 };
 
+const compareTodos = (a: Todo, b: Todo) => {
+	if (a.isCompleted !== b.isCompleted) return a.isCompleted ? 1 : -1;
+
+	const aDue = normalizeDate(a.dueDate);
+	const bDue = normalizeDate(b.dueDate);
+
+	if (aDue !== bDue) {
+		if (aDue === null) return -1;
+		if (bDue === null) return 1;
+		if (aDue < bDue) return -1;
+		if (aDue > bDue) return 1;
+	}
+
+	if (a.priority !== b.priority) return a.priority - b.priority;
+
+	const aCreated = new Date(a.createdAt).getTime();
+	const bCreated = new Date(b.createdAt).getTime();
+
+	if (aCreated !== bCreated) return bCreated - aCreated;
+
+	return a.id - b.id;
+};
+
+const sortTodos = (todos: Todo[] | undefined) =>
+	todos ? [...todos].sort(compareTodos) : todos;
+
 export async function fetchTodos(view?: TodoFilter) {
 	const response = await axios.get<Todo[]>("/api/todos", {
 		params: { view },
@@ -113,7 +139,7 @@ export function useCreateTodo() {
 					...newTodo,
 				};
 
-				return old ? [optimisticTodo, ...old] : [optimisticTodo];
+				return sortTodos(old ? [...old, optimisticTodo] : [optimisticTodo]);
 			});
 
 			return { previousTodos };
@@ -168,9 +194,11 @@ export function useUpdateTodo() {
 			updateTodosCache((old, filter) => {
 				if (!old) return old;
 
-				return old
-					.map((todo) => (todo.id === id ? { ...todo, ...updates } : todo))
-					.filter((todo) => doesTodoMatchFilter(todo, filter));
+				return sortTodos(
+					old
+						.map((todo) => (todo.id === id ? { ...todo, ...updates } : todo))
+						.filter((todo) => doesTodoMatchFilter(todo, filter)),
+				);
 			});
 
 			return { previousTodos };

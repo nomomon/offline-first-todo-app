@@ -121,7 +121,7 @@ export function AddTaskInline() {
 						<PrioritySelect
 							value={priority}
 							onChange={setPriority}
-							triggerClassName="h-7 px-2 rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50"
+							triggerClassName="h-7! px-2! font-medium rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50"
 						/>
 					</div>
 					<div className="flex items-center gap-2">
