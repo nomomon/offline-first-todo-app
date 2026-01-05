@@ -10,32 +10,42 @@ export type NewTodo = Omit<
 	"id" | "userId" | "createdAt"
 >;
 export type UpdateTodo = Partial<NewTodo>;
+type TodoCounts = {
+	inbox: number;
+	today: number;
+	upcoming: number;
+	completed: number;
+};
+
+type TodosQueryKey = readonly ["todos", TodoFilter?];
+const todosQueryKey = (view?: TodoFilter): TodosQueryKey => ["todos", view];
+const todoCountsQueryKey = ["todo-counts"] as const;
+
+const normalizeDate = (value?: Date | string | null): string | null => {
+	if (!value) return null;
+	return typeof value === "string" ? value : value.toISOString().split("T")[0];
+};
 
 export async function fetchTodos(view?: TodoFilter) {
-	const response = await axios.get("/api/todos", {
+	const response = await axios.get<Todo[]>("/api/todos", {
 		params: { view },
 	});
-	return response.data as Todo[];
+	return response.data;
 }
 
 export function useTodos(view?: TodoFilter) {
 	return useQuery({
-		queryKey: ["todos", view],
+		queryKey: todosQueryKey(view),
 		queryFn: () => fetchTodos(view),
 	});
 }
 
 export function useTodoCounts() {
 	return useQuery({
-		queryKey: ["todo-counts"],
+		queryKey: todoCountsQueryKey,
 		queryFn: async () => {
-			const response = await axios.get("/api/todos/counts");
-			return response.data as {
-				inbox: number;
-				today: number;
-				upcoming: number;
-				completed: number;
-			};
+			const response = await axios.get<TodoCounts>("/api/todos/counts");
+			return response.data;
 		},
 	});
 }
@@ -45,7 +55,7 @@ function doesTodoMatchFilter(
 	filter?: TodoFilter,
 ): boolean {
 	const isCompleted = "isCompleted" in todo ? todo.isCompleted : false;
-	const dueDate = todo.dueDate;
+	const dueDate = normalizeDate(todo.dueDate);
 	const today = new Date().toISOString().split("T")[0];
 
 	if (filter === "completed") return isCompleted === true;
@@ -62,21 +72,33 @@ function doesTodoMatchFilter(
 export function useCreateTodo() {
 	const queryClient = useQueryClient();
 
+	const updateTodosCache = (
+		updater: (
+			todos: Todo[] | undefined,
+			filter: TodoFilter | undefined,
+		) => Todo[] | undefined,
+	) => {
+		const todosQueries = queryClient.getQueriesData<Todo[]>({
+			queryKey: ["todos"],
+		});
+
+		todosQueries.forEach(([queryKey]) => {
+			const filter = (queryKey as TodosQueryKey)[1];
+			queryClient.setQueryData<Todo[]>(queryKey, (old) => updater(old, filter));
+		});
+	};
+
 	return useMutation({
 		mutationFn: async (todo: NewTodo) => {
-			const response = await axios.post("/api/todos", todo);
-			return response.data as Todo;
+			const response = await axios.post<Todo>("/api/todos", todo);
+			return response.data;
 		},
 		onMutate: async (newTodo) => {
 			await queryClient.cancelQueries({ queryKey: ["todos"] });
 
 			const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
 
-			queryClient.setQueriesData<
-				{ queryKey: [string, TodoFilter | undefined] },
-				Todo[]
-			>({ queryKey: ["todos"] }, (old, query) => {
-				const filter = query.queryKey[1];
+			updateTodosCache((old, filter) => {
 				if (!doesTodoMatchFilter(newTodo, filter)) return old;
 
 				const optimisticTodo: Todo = {
@@ -91,7 +113,7 @@ export function useCreateTodo() {
 					...newTodo,
 				};
 
-				return old ? [...old, optimisticTodo] : [optimisticTodo];
+				return old ? [optimisticTodo, ...old] : [optimisticTodo];
 			});
 
 			return { previousTodos };
@@ -117,31 +139,37 @@ export function useCreateTodo() {
 export function useUpdateTodo() {
 	const queryClient = useQueryClient();
 
+	const updateTodosCache = (
+		updater: (
+			todos: Todo[] | undefined,
+			filter: TodoFilter | undefined,
+		) => Todo[] | undefined,
+	) => {
+		const todosQueries = queryClient.getQueriesData<Todo[]>({
+			queryKey: ["todos"],
+		});
+
+		todosQueries.forEach(([queryKey]) => {
+			const filter = (queryKey as TodosQueryKey)[1];
+			queryClient.setQueryData<Todo[]>(queryKey, (old) => updater(old, filter));
+		});
+	};
+
 	return useMutation({
 		mutationFn: async ({ id, ...todo }: UpdateTodo & { id: number }) => {
-			const response = await axios.patch(`/api/todos/${id}`, todo);
-			return response.data as Todo;
+			const response = await axios.patch<Todo>(`/api/todos/${id}`, todo);
+			return response.data;
 		},
 		onMutate: async ({ id, ...updates }) => {
 			await queryClient.cancelQueries({ queryKey: ["todos"] });
 
 			const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
 
-			queryClient.setQueriesData<
-				{ queryKey: [string, TodoFilter | undefined] },
-				Todo[]
-			>({ queryKey: ["todos"] }, (old, query) => {
+			updateTodosCache((old, filter) => {
 				if (!old) return old;
 
-				const filter = query.queryKey[1];
-
 				return old
-					.map((todo) => {
-						if (todo.id === id) {
-							return { ...todo, ...updates };
-						}
-						return todo;
-					})
+					.map((todo) => (todo.id === id ? { ...todo, ...updates } : todo))
 					.filter((todo) => doesTodoMatchFilter(todo, filter));
 			});
 
@@ -168,20 +196,26 @@ export function useUpdateTodo() {
 export function useDeleteTodo() {
 	const queryClient = useQueryClient();
 
+	const updateTodosCache = (
+		updater: (todos: Todo[] | undefined) => Todo[] | undefined,
+	) => {
+		queryClient.setQueriesData<Todo[]>(
+			{ queryKey: ["todos"] },
+			(old: Todo[] | undefined) => updater(old),
+		);
+	};
+
 	return useMutation({
 		mutationFn: async (id: number) => {
-			const response = await axios.delete(`/api/todos/${id}`);
-			return response.data as Todo;
+			const response = await axios.delete<Todo>(`/api/todos/${id}`);
+			return response.data;
 		},
 		onMutate: async (id) => {
 			await queryClient.cancelQueries({ queryKey: ["todos"] });
 
 			const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
 
-			queryClient.setQueriesData<
-				{ queryKey: [string, TodoFilter | undefined] },
-				Todo[]
-			>({ queryKey: ["todos"] }, (old) => {
+			updateTodosCache((old) => {
 				if (!old) return old;
 				return old.filter((todo) => todo.id !== id);
 			});
