@@ -1,11 +1,18 @@
-import { defaultCache } from "@serwist/next/worker";
+/// <reference lib="webworker" />
+import { PAGES_CACHE_NAME } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { Serwist } from "serwist";
+import {
+	CacheFirst,
+	ExpirationPlugin,
+	NetworkFirst,
+	Serwist,
+	StaleWhileRevalidate,
+} from "serwist";
 
-// This declares the value of `injectionPoint` to TypeScript.
-// `injectionPoint` is the string that will be replaced by the
-// actual precache manifest. By default, this string is set to
-// `"self.__SW_MANIFEST"`.
+const SW_CACHE_TIME_ONE_DAY_S = 60 * 60 * 24;
+const SW_CACHE_TIME_SEVEN_DAYS_S = SW_CACHE_TIME_ONE_DAY_S * 7;
+
+// ---- Serwist globals ----
 declare global {
 	interface WorkerGlobalScope extends SerwistGlobalConfig {
 		__SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
@@ -14,22 +21,114 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope;
 
+// ---- Serwist instance ----
 const serwist = new Serwist({
 	precacheEntries: self.__SW_MANIFEST,
 	skipWaiting: true,
 	clientsClaim: true,
 	navigationPreload: true,
-	runtimeCaching: defaultCache,
-	fallbacks: {
-		entries: [
-			{
-				url: "/",
-				matcher({ request }) {
-					return request.destination === "document";
-				},
-			},
-		],
+	disableDevLogs: true,
+	precacheOptions: {
+		cleanupOutdatedCaches: true,
 	},
+
+	// IMPORTANT: define our own runtimeCaching instead of defaultCache
+	runtimeCaching: [
+		// 1) App Router RSC responses (Next.js 13+ App Router)
+		{
+			matcher: ({ request, url: { pathname }, sameOrigin }) =>
+				request.headers.get("RSC") === "1" &&
+				sameOrigin &&
+				!pathname.startsWith("/api/"),
+			handler: new NetworkFirst({
+				cacheName: PAGES_CACHE_NAME.rsc,
+				plugins: [
+					new ExpirationPlugin({
+						maxEntries: 64,
+						maxAgeSeconds: SW_CACHE_TIME_ONE_DAY_S, // 1 day
+					}),
+				],
+				matchOptions: {
+					ignoreSearch: true,
+					ignoreVary: true,
+				},
+			}),
+		},
+
+		// 2) HTML documents (navigations)
+		{
+			matcher: ({ request, url: { pathname }, sameOrigin }) =>
+				request.destination === "document" &&
+				sameOrigin &&
+				!pathname.startsWith("/api/"),
+			handler: new NetworkFirst({
+				cacheName: PAGES_CACHE_NAME.html,
+				plugins: [
+					new ExpirationPlugin({
+						maxEntries: 64,
+						maxAgeSeconds: SW_CACHE_TIME_ONE_DAY_S,
+					}),
+				],
+				matchOptions: {
+					ignoreSearch: true,
+					ignoreVary: true,
+				},
+			}),
+		},
+
+		// 3) JS + CSS (static resources)
+		{
+			matcher: ({ request }) =>
+				request.destination === "script" || request.destination === "style",
+			handler: new StaleWhileRevalidate({
+				cacheName: "static-resources",
+				matchOptions: {
+					ignoreVary: true,
+				},
+			}),
+		},
+
+		// 4) Fonts + images + manifest
+		{
+			matcher: ({ request }) =>
+				request.destination === "image" ||
+				request.destination === "font" ||
+				request.destination === "manifest",
+			handler: new CacheFirst({
+				cacheName: "static-media",
+				plugins: [
+					new ExpirationPlugin({
+						maxEntries: 64,
+						maxAgeSeconds: SW_CACHE_TIME_SEVEN_DAYS_S, // 7 days
+					}),
+				],
+				matchOptions: {
+					ignoreVary: true,
+				},
+			}),
+		},
+
+		// 5) General API GET requests
+		{
+			matcher: ({ url, sameOrigin, request }) =>
+				sameOrigin &&
+				url.pathname.startsWith("/api/") &&
+				request.method === "GET",
+			handler: new NetworkFirst({
+				cacheName: "api-data",
+				plugins: [
+					new ExpirationPlugin({
+						maxEntries: 50,
+						maxAgeSeconds: SW_CACHE_TIME_ONE_DAY_S, // 1 day
+					}),
+				],
+				matchOptions: {
+					ignoreVary: true,
+				},
+			}),
+		},
+	],
 });
 
+// ---- Start Serwist ----
 serwist.addEventListeners();
