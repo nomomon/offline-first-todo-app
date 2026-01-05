@@ -12,39 +12,43 @@ import {
 	SidebarGroup,
 	SidebarHeader,
 	SidebarMenu,
+	SidebarMenuBadge,
 	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarRail,
 } from "@/components/ui/sidebar";
 import { AddTaskButton } from "./add-task";
 
-// This is sample data.
-const data = {
-	navItems: [
-		{
-			title: "Inbox",
-			url: "/inbox",
-			icon: Inbox,
-		},
-		{
-			title: "Today",
-			url: "/",
-			icon: Calendar1,
-		},
-		{
-			title: "Future",
-			url: "/upcoming",
-			icon: CalendarDays,
-		},
-		{
-			title: "Archive",
-			url: "/completed",
-			icon: Archive,
-		},
-	],
-};
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const data = {
+		navItems: [
+			{
+				title: "Inbox",
+				url: "/inbox",
+				icon: Inbox,
+				count: 0,
+			},
+			{
+				title: "Today",
+				url: "/",
+				icon: Calendar1,
+				count: 0,
+			},
+			{
+				title: "Future",
+				url: "/upcoming",
+				icon: CalendarDays,
+				count: 0,
+			},
+			{
+				title: "Archive",
+				url: "/completed",
+				icon: Archive,
+				count: 0,
+			},
+		],
+	};
+
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
@@ -64,6 +68,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 										<span>{item.title}</span>
 									</Link>
 								</SidebarMenuButton>
+								<SidebarMenuBadge>
+									{item.count > 0 ? item.count : null}
+								</SidebarMenuBadge>
 							</SidebarMenuItem>
 						))}
 					</SidebarMenu>

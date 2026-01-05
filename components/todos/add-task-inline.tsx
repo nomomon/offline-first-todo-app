@@ -1,15 +1,20 @@
 "use client";
 
-import { Calendar, Plus, X } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar, Clock, Flag, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useCreateTodo } from "@/lib/backend/todos";
 import { cn } from "@/lib/utils";
+import { SmartDatePicker } from "./smart-date-picker";
 
 export function AddTaskInline() {
 	const [isEditing, setIsEditing] = useState(false);
 	const [content, setContent] = useState("");
+	const [description, setDescription] = useState("");
+	const [date, setDate] = useState<Date | undefined>();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const createTodo = useCreateTodo();
 
@@ -19,52 +24,22 @@ export function AddTaskInline() {
 		}
 	}, [isEditing]);
 
-	const parseDate = (text: string): { cleanText: string; date?: string } => {
-		const lowerText = text.toLowerCase();
-		const today = new Date();
-		let date: Date | undefined;
-		let cleanText = text;
-
-		// Simple parsing logic
-		if (lowerText.includes("today")) {
-			date = today;
-			cleanText = text.replace(/today/i, "").trim();
-		} else if (lowerText.includes("tomorrow")) {
-			const tomorrow = new Date(today);
-			tomorrow.setDate(tomorrow.getDate() + 1);
-			date = tomorrow;
-			cleanText = text.replace(/tomorrow/i, "").trim();
-		}
-
-		// Extract time (e.g., "at 10am", "at 14:00")
-		const timeMatch = lowerText.match(/at\s+(\d{1,2}(?::\d{2})?(?:am|pm)?)/);
-		if (timeMatch && date) {
-			// If we have a date, try to set the time
-			// This is a very basic implementation and might need a real library for robust parsing
-			// For now, we'll just keep the date part or rely on the backend/date object if we were doing full datetime
-		}
-
-		return {
-			cleanText,
-			date: date ? date.toISOString() : undefined,
-		};
-	};
-
 	const handleSubmit = (e?: React.FormEvent) => {
 		e?.preventDefault();
 		if (!content.trim()) return;
 
-		const { cleanText, date } = parseDate(content);
-
 		createTodo.mutate(
 			{
-				content: cleanText,
-				dueDate: date,
+				content: content,
+				description: description || undefined,
+				dueDate: date ? date.toISOString() : undefined,
 				isCompleted: false,
 			},
 			{
 				onSuccess: () => {
 					setContent("");
+					setDescription("");
+					setDate(undefined);
 					// Keep isEditing true to allow adding multiple tasks
 					inputRef.current?.focus();
 				},
@@ -76,6 +51,8 @@ export function AddTaskInline() {
 		if (e.key === "Escape") {
 			setIsEditing(false);
 			setContent("");
+			setDescription("");
+			setDate(undefined);
 		}
 	};
 
@@ -95,48 +72,70 @@ export function AddTaskInline() {
 	}
 
 	return (
-		<div className="border rounded-lg p-3 shadow-sm bg-card animate-in fade-in zoom-in-95 duration-200">
-			<form onSubmit={handleSubmit} className="flex flex-col gap-3">
-				<div className="flex flex-col gap-2">
-					<Input
-						ref={inputRef}
-						value={content}
-						onChange={(e) => setContent(e.target.value)}
-						onKeyDown={handleKeyDown}
-						placeholder="Task name"
-						className="border-none shadow-none focus-visible:ring-0 p-0 text-base font-medium placeholder:text-muted-foreground/50"
-					/>
+		<div className="border border-gray-200 rounded-xl p-4 shadow-sm bg-white animate-in fade-in zoom-in-95 duration-200">
+			<form onSubmit={handleSubmit} className="flex flex-col gap-2">
+				<Input
+					ref={inputRef}
+					value={content}
+					onChange={(e) => setContent(e.target.value)}
+					onKeyDown={handleKeyDown}
+					placeholder="Task name"
+					className="text-base font-medium placeholder:text-gray-400 border-none focus-visible:ring-0 p-0 shadow-none"
+				/>
+				<Textarea
+					value={description}
+					onChange={(e) => setDescription(e.target.value)}
+					placeholder="Description"
+					className="text-sm text-gray-600 placeholder:text-gray-400 border-none focus-visible:ring-0 p-0 resize-none min-h-[20px] shadow-none"
+				/>
+
+				<div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-2">
 					<div className="flex items-center gap-2">
+						<SmartDatePicker date={date} setDate={setDate}>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								className={cn(
+									"h-7 px-2 rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50",
+									date && "text-primary border-primary/20 bg-primary/5",
+								)}
+							>
+								<Calendar className="w-4 h-4 mr-1" />
+								{date ? format(date, "MMM d") : "Date"}
+							</Button>
+						</SmartDatePicker>
+
 						<Button
 							type="button"
 							variant="outline"
 							size="sm"
-							className="h-7 px-2 text-xs text-muted-foreground hover:text-primary"
+							className="h-7 px-2 rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50"
 						>
-							<Calendar className="w-3 h-3 mr-1" />
-							Due date
+							<Flag className="w-4 h-4" />
 						</Button>
-					</div>
-				</div>
-				<div className="flex items-center justify-between border-t pt-2 mt-1">
-					<div className="flex items-center gap-2">
-						{/* Placeholder for extra actions like labels, priority */}
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							className="h-7 px-2 rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50"
+						>
+							<Clock className="w-4 h-4" />
+						</Button>
 					</div>
 					<div className="flex items-center gap-2">
 						<Button
 							type="button"
 							variant="ghost"
-							size="sm"
 							onClick={() => setIsEditing(false)}
-							className="h-8"
+							className="h-8 text-gray-500 hover:bg-gray-100"
 						>
 							Cancel
 						</Button>
 						<Button
 							type="submit"
-							size="sm"
 							disabled={!content.trim() || createTodo.isPending}
-							className="h-8 bg-[#db4c3f] hover:bg-[#db4c3f]/90 text-white" // Todoist red color
+							className="h-8 bg-[#db4c3f] hover:bg-[#db4c3f]/90 text-white font-medium px-4"
 						>
 							Add task
 						</Button>

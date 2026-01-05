@@ -23,12 +23,12 @@ export default async function AppLayout({
 		<SidebarProvider>
 			<AppSidebar />
 			<SidebarInset>
-				<header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-					<div className="px-3">
+				<header className="relative flex h-16 shrink-0 w-full">
+					<div className="absolute left-2 top-8 -translate-y-1/2 transition-[top] duration-200 ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:top-6">
 						<SidebarTrigger />
 					</div>
 				</header>
-				<main className="flex-1 p-4">{children}</main>
+				<main className="flex-1 p-4 max-w-3xl w-full m-auto">{children}</main>
 			</SidebarInset>
 		</SidebarProvider>
 	);

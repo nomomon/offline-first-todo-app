@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { CreateTodoSheet } from "@/components/todos/create-todo-sheet";
+import { CreateTodoDialog } from "@/components/todos/create-todo-dialog";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { useSidebar } from "../ui/sidebar";
@@ -8,7 +8,7 @@ export function AddTaskButton() {
 	const { state } = useSidebar();
 
 	return (
-		<CreateTodoSheet>
+		<CreateTodoDialog>
 			<Button size="sm" className="rounded-2xl">
 				<Plus />
 				<span
@@ -19,6 +19,6 @@ export function AddTaskButton() {
 					Add task
 				</span>
 			</Button>
-		</CreateTodoSheet>
+		</CreateTodoDialog>
 	);
 }

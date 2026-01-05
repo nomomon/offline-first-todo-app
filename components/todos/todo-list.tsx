@@ -25,7 +25,7 @@ export function TodoList({ filter }: TodoListProps) {
 	}
 
 	return (
-		<div className="flex flex-col gap-1">
+		<div className="flex flex-col">
 			{todos && todos.length > 0 ? (
 				todos.map((todo) => <TodoItem key={todo.id} todo={todo} />)
 			) : (
@@ -34,7 +34,7 @@ export function TodoList({ filter }: TodoListProps) {
 				</div>
 			)}
 
-			<div className="mt-2">
+			<div className="mt-4">
 				<AddTaskInline />
 			</div>
 		</div>
