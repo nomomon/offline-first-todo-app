@@ -4,7 +4,6 @@ import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import {
 	CacheFirst,
 	ExpirationPlugin,
-	NetworkFirst,
 	Serwist,
 	StaleWhileRevalidate,
 } from "serwist";
@@ -40,7 +39,7 @@ const serwist = new Serwist({
 				request.headers.get("RSC") === "1" &&
 				sameOrigin &&
 				!pathname.startsWith("/api/"),
-			handler: new NetworkFirst({
+			handler: new StaleWhileRevalidate({
 				cacheName: PAGES_CACHE_NAME.rsc,
 				plugins: [
 					new ExpirationPlugin({
@@ -61,7 +60,7 @@ const serwist = new Serwist({
 				request.destination === "document" &&
 				sameOrigin &&
 				!pathname.startsWith("/api/"),
-			handler: new NetworkFirst({
+			handler: new StaleWhileRevalidate({
 				cacheName: PAGES_CACHE_NAME.html,
 				plugins: [
 					new ExpirationPlugin({
