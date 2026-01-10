@@ -32,6 +32,10 @@ const serwist = new Serwist({
 	},
 
 	// IMPORTANT: define our own runtimeCaching instead of defaultCache
+	// Using StaleWhileRevalidate strategy for offline-first behavior:
+	// - Serves from cache immediately if available (instant load)
+	// - Updates cache in background when online
+	// - Works fully offline after initial page visits cache content
 	runtimeCaching: [
 		// 1) App Router RSC responses (Next.js 13+ App Router)
 		{
