@@ -46,7 +46,12 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 				defaultOptions: {
 					queries: {
 						gcTime: DAY_IN_MS,
+						staleTime: 5 * 60 * 1000, // 5 minutes - consider data fresh for this long
 						networkMode: "offlineFirst",
+						refetchOnMount: false, // Don't refetch on mount if we have cached data
+						refetchOnWindowFocus: false, // Don't refetch when window regains focus
+						refetchOnReconnect: true, // Do refetch when coming back online
+						retry: 1, // Retry failed requests once
 					},
 					mutations: {
 						gcTime: DAY_IN_MS,
