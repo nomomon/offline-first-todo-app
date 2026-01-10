@@ -51,6 +51,9 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 					mutations: {
 						gcTime: DAY_IN_MS,
 						networkMode: "offlineFirst",
+						retry: 3,
+						retryDelay: (attemptIndex) =>
+							Math.min(1000 * 2 ** attemptIndex, 30000),
 					},
 				},
 			}),
@@ -64,7 +67,15 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 		if (typeof window === "undefined") return;
 
 		setPersister(createIDBPersister());
-	}, []);
+
+		// Resume paused mutations when coming back online
+		const handleOnline = () => {
+			queryClient.resumePausedMutations();
+		};
+
+		window.addEventListener("online", handleOnline);
+		return () => window.removeEventListener("online", handleOnline);
+	}, [queryClient]);
 
 	const persistOptions = useMemo<PersistOptions>(
 		() => ({
