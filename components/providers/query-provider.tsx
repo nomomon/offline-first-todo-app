@@ -67,7 +67,15 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 		if (typeof window === "undefined") return;
 
 		setPersister(createIDBPersister());
-	}, []);
+
+		// Resume paused mutations when coming back online
+		const handleOnline = () => {
+			queryClient.resumePausedMutations();
+		};
+
+		window.addEventListener("online", handleOnline);
+		return () => window.removeEventListener("online", handleOnline);
+	}, [queryClient]);
 
 	const persistOptions = useMemo<PersistOptions>(
 		() => ({
