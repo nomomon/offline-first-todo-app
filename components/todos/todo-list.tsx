@@ -29,10 +29,39 @@ export function TodoList({ filter }: TodoListProps) {
 		);
 	}
 
+	// Separate incomplete and completed tasks
+	const incompleteTodos = todos?.filter((todo) => !todo.isCompleted) || [];
+	const completedTodos = todos?.filter((todo) => todo.isCompleted) || [];
+	const hasAnyTodos = incompleteTodos.length > 0 || completedTodos.length > 0;
+
 	return (
 		<div className="flex flex-col">
-			{todos && todos.length > 0 ? (
-				todos.map((todo) => <TodoItem key={todo.id} todo={todo} />)
+			{hasAnyTodos ? (
+				<>
+					{/* Incomplete tasks */}
+					{incompleteTodos.map((todo) => (
+						<TodoItem key={todo.id} todo={todo} />
+					))}
+
+					{/* Completed tasks section */}
+					{completedTodos.length > 0 && (
+						<>
+							{incompleteTodos.length > 0 && (
+								<div className="mt-6 mb-4 border-t border-border" />
+							)}
+							<div className="space-y-0">
+								{incompleteTodos.length > 0 && (
+									<h3 className="text-sm font-medium text-muted-foreground mb-3">
+										Completed
+									</h3>
+								)}
+								{completedTodos.map((todo) => (
+									<TodoItem key={todo.id} todo={todo} />
+								))}
+							</div>
+						</>
+					)}
+				</>
 			) : (
 				<div className="py-8 text-center text-muted-foreground text-sm">
 					No tasks yet. Add one below!

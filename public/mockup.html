@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App - UI Changes Preview</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { margin-bottom: 30px; color: #333; }
+        .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 50px; }
+        .view-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { font-size: 18px; margin-bottom: 15px; color: #666; }
+        h3 { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .description { color: #999; font-size: 14px; margin-bottom: 20px; }
+        .todo-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 0; 
+            border-bottom: 1px solid #eee;
+            gap: 12px;
+        }
+        .todo-item:last-child { border-bottom: none; }
+        .checkbox { 
+            width: 20px; 
+            height: 20px; 
+            border: 2px solid #ddd; 
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .checkbox.checked { 
+            background: #22c55e; 
+            border-color: #22c55e;
+            position: relative;
+        }
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+        }
+        .todo-content { flex: 1; }
+        .todo-title { font-size: 14px; font-weight: 500; }
+        .todo-title.completed { 
+            text-decoration: line-through; 
+            color: #999;
+        }
+        .separator { 
+            margin: 24px 0 16px 0; 
+            border-top: 1px solid #e5e5e5;
+        }
+        .section-header { 
+            font-size: 14px; 
+            font-weight: 500; 
+            color: #999;
+            margin-bottom: 12px;
+        }
+        .before { border-left: 4px solid #ef4444; }
+        .after { border-left: 4px solid #22c55e; }
+        .mobile-nav { 
+            display: flex; 
+            justify-content: space-around; 
+            background: white; 
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 4px;
+            padding: 8px 12px;
+            color: #999;
+            font-size: 12px;
+        }
+        .nav-item.active { color: #3b82f6; }
+        .nav-icon { 
+            width: 24px; 
+            height: 24px; 
+            background: currentColor;
+            border-radius: 4px;
+        }
+        .badge { 
+            background: #ef4444; 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 10px; 
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .badge.success { background: #22c55e; }
+        .label { 
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .label.before { background: #fee2e2; color: #ef4444; }
+        .label.after { background: #dcfce7; color: #22c55e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Todo App - Plan A Implementation Preview</h1>
+        
+        <div class="comparison">
+            <div class="view-section before">
+                <span class="label before">BEFORE</span>
+                <h2>Today View (Old Behavior)</h2>
+                <div>
+                    <h3>Today</h3>
+                    <p class="description">Focus on what must ship today.</p>
+                    
+                    <div class="todo-item">
+                        <div class="checkbox"></div>
+                        <div class="todo-content">
+                            <div class="todo-title">Finish project report</div>
+                        </div>
+                    </div>
+                    <div class="todo-item">
+                        <div class="checkbox"></div>
+                        <div class="todo-content">
+                            <div class="todo-title">Review pull requests</div>
+                        </div>
+                    </div>
+                    <div class="todo-item">
+                        <div class="checkbox"></div>
+                        <div class="todo-content">
+                            <div class="todo-title">Team meeting at 2pm</div>
+                        </div>
+                    </div>
+                    
+                    <p style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 6px; font-size: 13px;">
+                        ⚠️ Problem: When you complete a task, it immediately disappears!<br>
+                        No sense of accomplishment. Hard to undo mistakes.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="view-section after">
+                <span class="label after">AFTER - Plan A ✨</span>
+                <h2>Today View (New Behavior)</h2>
+                <div>
+                    <h3>Today</h3>
+                    <p class="description">Focus on what must ship today.</p>
+                    
+                    <div class="todo-item">
+                        <div class="checkbox"></div>
+                        <div class="todo-content">
+                            <div class="todo-title">Finish project report</div>
+                        </div>
+                    </div>
+                    <div class="todo-item">
+                        <div class="checkbox"></div>
+                        <div class="todo-content">
+                            <div class="todo-title">Team meeting at 2pm</div>
+                        </div>
+                    </div>
+                    
+                    <div class="separator"></div>
+                    <div class="section-header">Completed</div>
+                    
+                    <div class="todo-item">
+                        <div class="checkbox checked"></div>
+                        <div class="todo-content">
+                            <div class="todo-title completed">Review pull requests</div>
+                        </div>
+                    </div>
+                    <div class="todo-item">
+                        <div class="checkbox checked"></div>
+                        <div class="todo-content">
+                            <div class="todo-title completed">Morning standup</div>
+                        </div>
+                    </div>
+                    <div class="todo-item">
+                        <div class="checkbox checked"></div>
+                        <div class="todo-content">
+                            <div class="todo-title completed">Check emails</div>
+                        </div>
+                    </div>
+                    
+                    <p style="margin-top: 20px; padding: 15px; background: #dcfce7; border-radius: 6px; font-size: 13px;">
+                        ✅ Solution: Completed tasks stay visible but grayed out.<br>
+                        Clear visual progress. Easy to undo. Sense of accomplishment!
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <h2 style="margin: 40px 0 20px 0;">Mobile Navigation Update</h2>
+        <div class="comparison">
+            <div class="view-section before">
+                <span class="label before">BEFORE - Mobile (3 tabs)</span>
+                <div class="mobile-nav">
+                    <div class="nav-item active">
+                        <div class="nav-icon"></div>
+                        <span>Today</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon"></div>
+                        <span>Inbox</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon" style="width: 40px; height: 40px; border-radius: 50%; background: #3b82f6;"></div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon"></div>
+                        <span>Future</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon"></div>
+                        <span>You</span>
+                    </div>
+                </div>
+                <p style="margin-top: 15px; padding: 15px; background: #fef3c7; border-radius: 6px; font-size: 13px;">
+                    ⚠️ Problem: Archive is missing! Can't access completed tasks on mobile.
+                </p>
+            </div>
+            
+            <div class="view-section after">
+                <span class="label after">AFTER - Mobile (with Archive) ✨</span>
+                <div class="mobile-nav">
+                    <div class="nav-item active">
+                        <div class="nav-icon"></div>
+                        <span>Today</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon"></div>
+                        <span>Inbox</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon" style="width: 40px; height: 40px; border-radius: 50%; background: #3b82f6;"></div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon"></div>
+                        <span>Future</span>
+                    </div>
+                    <div class="nav-item" style="color: #22c55e; font-weight: 600;">
+                        <div class="nav-icon"></div>
+                        <span>Archive</span>
+                    </div>
+                </div>
+                <p style="margin-top: 15px; padding: 15px; background: #dcfce7; border-radius: 6px; font-size: 13px;">
+                    ✅ Solution: Archive now accessible on mobile! Full feature parity with desktop.
+                </p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 50px; padding: 30px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h2 style="margin-bottom: 20px;">✨ Key Benefits of Plan A</h2>
+            <ul style="list-style: none; line-height: 2;">
+                <li>✅ <strong>Sense of accomplishment:</strong> See what you've completed throughout the day</li>
+                <li>✅ <strong>Easy error recovery:</strong> Accidentally checked a task? Uncheck it immediately</li>
+                <li>✅ <strong>Better progress tracking:</strong> Visual indicator of daily productivity</li>
+                <li>✅ <strong>Mobile parity:</strong> Archive now accessible on mobile devices</li>
+                <li>✅ <strong>Minimal changes:</strong> No database schema changes, backward compatible</li>
+                <li>✅ <strong>Industry standard:</strong> Follows patterns from Todoist, Microsoft To Do, Apple Reminders</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 30px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
+            <h2 style="margin-bottom: 15px; color: #1e40af;">📝 What Changed in the Code</h2>
+            <ol style="line-height: 2; padding-left: 20px;">
+                <li><strong>Database Queries:</strong> Removed <code>isCompleted = false</code> filter from inbox/today/upcoming views</li>
+                <li><strong>Frontend Logic:</strong> Updated <code>doesTodoMatchFilter()</code> to allow completed tasks in their views</li>
+                <li><strong>UI Component:</strong> Added visual separator and "Completed" section header in TodoList</li>
+                <li><strong>Mobile Navigation:</strong> Added Archive tab, replaced "You" menu (now has 5 tabs)</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>

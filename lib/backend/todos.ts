@@ -86,8 +86,8 @@ function doesTodoMatchFilter(
 
 	if (filter === "completed") return isCompleted === true;
 
-	if (isCompleted) return false;
-
+	// Allow completed tasks to remain in their respective views
+	// based on due date, not just show only incomplete tasks
 	if (filter === "inbox") return !dueDate;
 	if (filter === "today") return dueDate !== null && dueDate <= today;
 	if (filter === "upcoming") return dueDate !== null && dueDate > today;
