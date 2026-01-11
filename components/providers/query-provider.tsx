@@ -9,6 +9,11 @@ import {
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 import { useEffect, useMemo, useState } from "react";
+import {
+	createTodoCall,
+	deleteTodoCall,
+	updateTodoCall,
+} from "@/lib/backend/todos";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -72,6 +77,20 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 		if (typeof window === "undefined") return;
 
 		setPersister(createIDBPersister());
+
+		// Set mutation defaults for offline persistence
+		// This ensures mutations can be retried after app restart
+		queryClient.setMutationDefaults(["createTodo"], {
+			mutationFn: createTodoCall,
+		});
+
+		queryClient.setMutationDefaults(["updateTodo"], {
+			mutationFn: updateTodoCall,
+		});
+
+		queryClient.setMutationDefaults(["deleteTodo"], {
+			mutationFn: deleteTodoCall,
+		});
 
 		// Resume paused mutations when coming back online
 		const handleOnline = () => {
