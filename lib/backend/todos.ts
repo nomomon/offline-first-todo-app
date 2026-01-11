@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import axios, { type AxiosError } from "@/lib/axios";
+import axios from "@/lib/axios";
+import { isNetworkError } from "@/lib/error-utils";
 import type { TodoFilter } from "../db/queries/todos";
 import type { todosTable } from "../db/schema";
 
@@ -20,19 +21,6 @@ type TodoCounts = {
 type TodosQueryKey = readonly ["todos", TodoFilter?];
 const todosQueryKey = (view?: TodoFilter): TodosQueryKey => ["todos", view];
 const todoCountsQueryKey = ["todo-counts"] as const;
-
-// Helper function to detect network errors
-const isNetworkError = (error: unknown): boolean => {
-	if (!error) return false;
-	const axiosError = error as AxiosError;
-	// Network errors have no response and specific codes
-	return (
-		!axiosError.response &&
-		(axiosError.code === "ERR_NETWORK" ||
-			axiosError.code === "ECONNABORTED" ||
-			axiosError.message === "Network Error")
-	);
-};
 
 const normalizeDate = (value?: Date | string | null): string | null => {
 	if (!value) return null;
