@@ -70,17 +70,14 @@ export async function getTodos(userId: number, filter?: TodoFilter) {
 	const today = new Date().toISOString().split("T")[0];
 
 	if (filter === "inbox") {
-		conditions.push(
-			and(isNull(todosTable.dueDate), eq(todosTable.isCompleted, false)),
-		);
+		// Show all tasks with no due date (both completed and incomplete)
+		conditions.push(isNull(todosTable.dueDate));
 	} else if (filter === "today") {
-		conditions.push(
-			and(lte(todosTable.dueDate, today), eq(todosTable.isCompleted, false)),
-		);
+		// Show all tasks due today or earlier (both completed and incomplete)
+		conditions.push(lte(todosTable.dueDate, today));
 	} else if (filter === "upcoming") {
-		conditions.push(
-			and(gt(todosTable.dueDate, today), eq(todosTable.isCompleted, false)),
-		);
+		// Show all tasks due in the future (both completed and incomplete)
+		conditions.push(gt(todosTable.dueDate, today));
 	} else if (filter === "completed") {
 		conditions.push(eq(todosTable.isCompleted, true));
 	}
