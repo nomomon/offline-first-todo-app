@@ -7,6 +7,7 @@ import {
 	type PersistQueryClientOptions,
 	PersistQueryClientProvider,
 } from "@tanstack/react-query-persist-client";
+import type { AxiosError } from "axios";
 import { del, get, set } from "idb-keyval";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -16,6 +17,18 @@ import {
 } from "@/lib/backend/todos";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
+
+// Helper function to detect network errors
+const isNetworkError = (error: unknown): boolean => {
+	if (!error) return false;
+	const axiosError = error as AxiosError;
+	return (
+		!axiosError.response &&
+		(axiosError.code === "ERR_NETWORK" ||
+			axiosError.code === "ECONNABORTED" ||
+			axiosError.message === "Network Error")
+	);
+};
 
 type PersistOptions = Omit<PersistQueryClientOptions, "queryClient">;
 type PersistedStorage = NonNullable<PersistOptions["persister"]>;
@@ -41,7 +54,7 @@ const createIDBPersister = (key = "offline-first-react-query-cache") =>
 			},
 		},
 		key,
-		throttleTime: 1000,
+		throttleTime: 100,
 	});
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
@@ -61,7 +74,14 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 					mutations: {
 						gcTime: DAY_IN_MS,
 						networkMode: "offlineFirst",
-						retry: 3,
+						retry: (failureCount, error) => {
+							// Retry network errors indefinitely (up to a reasonable limit)
+							if (isNetworkError(error)) {
+								return failureCount < 50; // Keep trying for network errors
+							}
+							// For other errors, only retry 3 times
+							return failureCount < 3;
+						},
 						retryDelay: (attemptIndex) =>
 							Math.min(1000 * 2 ** attemptIndex, 30000),
 					},

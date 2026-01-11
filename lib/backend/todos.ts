@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import axios from "@/lib/axios";
+import axios, { type AxiosError } from "@/lib/axios";
 import type { TodoFilter } from "../db/queries/todos";
 import type { todosTable } from "../db/schema";
 
@@ -20,6 +20,19 @@ type TodoCounts = {
 type TodosQueryKey = readonly ["todos", TodoFilter?];
 const todosQueryKey = (view?: TodoFilter): TodosQueryKey => ["todos", view];
 const todoCountsQueryKey = ["todo-counts"] as const;
+
+// Helper function to detect network errors
+const isNetworkError = (error: unknown): boolean => {
+	if (!error) return false;
+	const axiosError = error as AxiosError;
+	// Network errors have no response and specific codes
+	return (
+		!axiosError.response &&
+		(axiosError.code === "ERR_NETWORK" ||
+			axiosError.code === "ECONNABORTED" ||
+			axiosError.message === "Network Error")
+	);
+};
 
 const normalizeDate = (value?: Date | string | null): string | null => {
 	if (!value) return null;
@@ -161,7 +174,14 @@ export function useCreateTodo() {
 
 			return { previousTodos };
 		},
-		onError: (_err, _newTodo, context) => {
+		onError: (err, _newTodo, context) => {
+			// Don't rollback optimistic updates on network errors
+			// to preserve them across page refreshes while offline
+			if (isNetworkError(err)) {
+				toast.error("Offline - changes will sync when online");
+				return;
+			}
+
 			toast.error("Failed to create todo");
 			if (context?.previousTodos) {
 				context.previousTodos.forEach(([queryKey, data]) => {
@@ -218,7 +238,14 @@ export function useUpdateTodo() {
 
 			return { previousTodos };
 		},
-		onError: (_err, _newTodo, context) => {
+		onError: (err, _newTodo, context) => {
+			// Don't rollback optimistic updates on network errors
+			// to preserve them across page refreshes while offline
+			if (isNetworkError(err)) {
+				toast.error("Offline - changes will sync when online");
+				return;
+			}
+
 			toast.error("Failed to update todo");
 			if (context?.previousTodos) {
 				context.previousTodos.forEach(([queryKey, data]) => {
@@ -263,7 +290,14 @@ export function useDeleteTodo() {
 
 			return { previousTodos };
 		},
-		onError: (_err, _id, context) => {
+		onError: (err, _id, context) => {
+			// Don't rollback optimistic updates on network errors
+			// to preserve them across page refreshes while offline
+			if (isNetworkError(err)) {
+				toast.error("Offline - changes will sync when online");
+				return;
+			}
+
 			toast.error("Failed to delete todo");
 			if (context?.previousTodos) {
 				context.previousTodos.forEach(([queryKey, data]) => {
