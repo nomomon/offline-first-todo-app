@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import axios from "@/lib/axios";
+import { isNetworkError } from "@/lib/error-utils";
 import type { TodoFilter } from "../db/queries/todos";
 import type { todosTable } from "../db/schema";
 
@@ -161,7 +162,14 @@ export function useCreateTodo() {
 
 			return { previousTodos };
 		},
-		onError: (_err, _newTodo, context) => {
+		onError: (err, _newTodo, context) => {
+			// Don't rollback optimistic updates on network errors
+			// to preserve them across page refreshes while offline
+			if (isNetworkError(err)) {
+				toast.error("Offline - changes will sync when online");
+				return;
+			}
+
 			toast.error("Failed to create todo");
 			if (context?.previousTodos) {
 				context.previousTodos.forEach(([queryKey, data]) => {
@@ -218,7 +226,14 @@ export function useUpdateTodo() {
 
 			return { previousTodos };
 		},
-		onError: (_err, _newTodo, context) => {
+		onError: (err, _newTodo, context) => {
+			// Don't rollback optimistic updates on network errors
+			// to preserve them across page refreshes while offline
+			if (isNetworkError(err)) {
+				toast.error("Offline - changes will sync when online");
+				return;
+			}
+
 			toast.error("Failed to update todo");
 			if (context?.previousTodos) {
 				context.previousTodos.forEach(([queryKey, data]) => {
@@ -263,7 +278,14 @@ export function useDeleteTodo() {
 
 			return { previousTodos };
 		},
-		onError: (_err, _id, context) => {
+		onError: (err, _id, context) => {
+			// Don't rollback optimistic updates on network errors
+			// to preserve them across page refreshes while offline
+			if (isNetworkError(err)) {
+				toast.error("Offline - changes will sync when online");
+				return;
+			}
+
 			toast.error("Failed to delete todo");
 			if (context?.previousTodos) {
 				context.previousTodos.forEach(([queryKey, data]) => {

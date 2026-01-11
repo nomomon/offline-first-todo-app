@@ -14,6 +14,11 @@ import {
 	deleteTodoCall,
 	updateTodoCall,
 } from "@/lib/backend/todos";
+import {
+	isNetworkError,
+	MAX_NETWORK_ERROR_RETRIES,
+	MAX_REGULAR_ERROR_RETRIES,
+} from "@/lib/error-utils";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -41,7 +46,7 @@ const createIDBPersister = (key = "offline-first-react-query-cache") =>
 			},
 		},
 		key,
-		throttleTime: 1000,
+		throttleTime: 100,
 	});
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
@@ -61,7 +66,14 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 					mutations: {
 						gcTime: DAY_IN_MS,
 						networkMode: "offlineFirst",
-						retry: 3,
+						retry: (failureCount, error) => {
+							// Retry network errors more times to handle temporary connectivity issues
+							if (isNetworkError(error)) {
+								return failureCount < MAX_NETWORK_ERROR_RETRIES;
+							}
+							// For other errors, only retry a few times
+							return failureCount < MAX_REGULAR_ERROR_RETRIES;
+						},
 						retryDelay: (attemptIndex) =>
 							Math.min(1000 * 2 ** attemptIndex, 30000),
 					},
