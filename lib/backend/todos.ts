@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
+import axios from "@/lib/axios";
 import type { TodoFilter } from "../db/queries/todos";
 import type { todosTable } from "../db/schema";
 
@@ -115,6 +115,7 @@ export function useCreateTodo() {
 	};
 
 	return useMutation({
+		mutationKey: ["createTodo"],
 		mutationFn: async (todo: NewTodo) => {
 			const response = await axios.post<Todo>("/api/todos", todo);
 			return response.data;
@@ -182,6 +183,7 @@ export function useUpdateTodo() {
 	};
 
 	return useMutation({
+		mutationKey: ["updateTodo"],
 		mutationFn: async ({ id, ...todo }: UpdateTodo & { id: number }) => {
 			const response = await axios.patch<Todo>(`/api/todos/${id}`, todo);
 			return response.data;
@@ -234,6 +236,7 @@ export function useDeleteTodo() {
 	};
 
 	return useMutation({
+		mutationKey: ["deleteTodo"],
 		mutationFn: async (id: number) => {
 			const response = await axios.delete<Todo>(`/api/todos/${id}`);
 			return response.data;

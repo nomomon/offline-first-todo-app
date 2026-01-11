@@ -73,6 +73,45 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 
 		setPersister(createIDBPersister());
 
+		// Set mutation defaults for offline persistence
+		// This ensures mutations can be retried after app restart
+		queryClient.setMutationDefaults(["createTodo"], {
+			mutationFn: async (newTodo) => {
+				const response = await fetch("/api/todos", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(newTodo),
+				});
+				return response.json();
+			},
+		});
+
+		queryClient.setMutationDefaults(["updateTodo"], {
+			mutationFn: async ({
+				id,
+				...todo
+			}: {
+				id: number;
+				[key: string]: unknown;
+			}) => {
+				const response = await fetch(`/api/todos/${id}`, {
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(todo),
+				});
+				return response.json();
+			},
+		});
+
+		queryClient.setMutationDefaults(["deleteTodo"], {
+			mutationFn: async (id: number) => {
+				const response = await fetch(`/api/todos/${id}`, {
+					method: "DELETE",
+				});
+				return response.json();
+			},
+		});
+
 		// Resume paused mutations when coming back online
 		const handleOnline = () => {
 			queryClient.resumePausedMutations();

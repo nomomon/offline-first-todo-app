@@ -4,6 +4,7 @@ import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import {
 	CacheFirst,
 	ExpirationPlugin,
+	NetworkFirst,
 	Serwist,
 	StaleWhileRevalidate,
 } from "serwist";
@@ -108,6 +109,21 @@ const serwist = new Serwist({
 				matchOptions: {
 					ignoreVary: true,
 				},
+			}),
+		},
+
+		// 5) API routes - NetworkFirst for offline-first API caching
+		{
+			matcher: ({ url }) => url.pathname.startsWith("/api/"),
+			handler: new NetworkFirst({
+				cacheName: "api",
+				plugins: [
+					new ExpirationPlugin({
+						maxEntries: 32,
+						maxAgeSeconds: SW_CACHE_TIME_ONE_DAY_S, // 1 day
+					}),
+				],
+				networkTimeoutSeconds: 10, // Fall back to cache after 10s
 			}),
 		},
 	],
