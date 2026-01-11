@@ -4,6 +4,7 @@ import { useTodos } from "@/lib/backend/todos";
 import type { TodoFilter } from "@/lib/db/queries/todos";
 import { AddTaskInline } from "./add-task-inline";
 import { TodoItem } from "./todo-item";
+import { TodoListSkeleton } from "./todo-item-skeleton";
 
 interface TodoListProps {
 	filter?: TodoFilter;
@@ -13,7 +14,11 @@ export function TodoList({ filter }: TodoListProps) {
 	const { data: todos, isLoading, error } = useTodos(filter);
 
 	if (isLoading) {
-		return <div className="p-4 text-center">Loading todos...</div>;
+		return (
+			<div className="flex flex-col">
+				<TodoListSkeleton count={5} />
+			</div>
+		);
 	}
 
 	if (error) {
