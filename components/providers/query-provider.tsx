@@ -82,6 +82,9 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(newTodo),
 				});
+				if (!response.ok) {
+					throw new Error(`Failed to create todo: ${response.statusText}`);
+				}
 				return response.json();
 			},
 		});
@@ -99,6 +102,9 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(todo),
 				});
+				if (!response.ok) {
+					throw new Error(`Failed to update todo: ${response.statusText}`);
+				}
 				return response.json();
 			},
 		});
@@ -108,6 +114,9 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 				const response = await fetch(`/api/todos/${id}`, {
 					method: "DELETE",
 				});
+				if (!response.ok) {
+					throw new Error(`Failed to delete todo: ${response.statusText}`);
+				}
 				return response.json();
 			},
 		});
