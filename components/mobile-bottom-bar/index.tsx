@@ -72,42 +72,43 @@ export function MobileBottomBar() {
 		},
 	];
 
-	// Extract icon components (must be PascalCase variables to use as React components)
-	const TodayIcon = navItems[0].icon;
-	const InboxIcon = navItems[1].icon;
-	const FutureIcon = navItems[2].icon;
+	// Extract icon components using destructuring for maintainability
+	const [todayNav, inboxNav, futureNav] = navItems;
+	const TodayIcon = todayNav.icon;
+	const InboxIcon = inboxNav.icon;
+	const FutureIcon = futureNav.icon;
 
 	return (
 		<div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
 			<nav className="flex items-center justify-around h-16 px-2">
 				{/* Today */}
 				<Link
-					href={navItems[0].href}
+					href={todayNav.href}
 					className={cn(
 						"flex flex-col items-center justify-center gap-1 h-full transition-colors rounded-lg px-3",
-						currentView === navItems[0].view
+						currentView === todayNav.view
 							? "text-primary"
 							: "text-muted-foreground hover:text-foreground",
 					)}
-					onMouseEnter={() => prefetchTodos(navItems[0].view)}
+					onMouseEnter={() => prefetchTodos(todayNav.view)}
 				>
 					<TodayIcon className="size-5" />
-					<span className="text-xs font-medium">{navItems[0].label}</span>
+					<span className="text-xs font-medium">{todayNav.label}</span>
 				</Link>
 
 				{/* Inbox */}
 				<Link
-					href={navItems[1].href}
+					href={inboxNav.href}
 					className={cn(
 						"flex flex-col items-center justify-center gap-1 h-full transition-colors rounded-lg px-3",
-						currentView === navItems[1].view
+						currentView === inboxNav.view
 							? "text-primary"
 							: "text-muted-foreground hover:text-foreground",
 					)}
-					onMouseEnter={() => prefetchTodos(navItems[1].view)}
+					onMouseEnter={() => prefetchTodos(inboxNav.view)}
 				>
 					<InboxIcon className="size-5" />
-					<span className="text-xs font-medium">{navItems[1].label}</span>
+					<span className="text-xs font-medium">{inboxNav.label}</span>
 				</Link>
 
 				{/* Add Task Button */}
@@ -123,17 +124,17 @@ export function MobileBottomBar() {
 
 				{/* Future */}
 				<Link
-					href={navItems[2].href}
+					href={futureNav.href}
 					className={cn(
 						"flex flex-col items-center justify-center gap-1 h-full transition-colors rounded-lg px-3",
-						currentView === navItems[2].view
+						currentView === futureNav.view
 							? "text-primary"
 							: "text-muted-foreground hover:text-foreground",
 					)}
-					onMouseEnter={() => prefetchTodos(navItems[2].view)}
+					onMouseEnter={() => prefetchTodos(futureNav.view)}
 				>
 					<FutureIcon className="size-5" />
-					<span className="text-xs font-medium">{navItems[2].label}</span>
+					<span className="text-xs font-medium">{futureNav.label}</span>
 				</Link>
 
 				{/* You Button (User Menu) */}
