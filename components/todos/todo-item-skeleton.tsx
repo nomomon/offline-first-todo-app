@@ -20,7 +20,7 @@ export function TodoItemSkeleton() {
 				</div>
 			</div>
 
-			{/* Delete button space skeleton */}
+			{/* Placeholder for delete button to maintain consistent layout */}
 			<div className="h-8 w-8" />
 		</div>
 	);
@@ -30,8 +30,8 @@ export function TodoListSkeleton({ count = 5 }: { count?: number }) {
 	return (
 		<div className="flex flex-col">
 			{Array.from({ length: count }).map((_, i) => (
-				// biome-ignore lint/suspicious/noArrayIndexKey: Skeleton loaders are static and don't reorder
-				<TodoItemSkeleton key={i} />
+				// biome-ignore lint/suspicious/noArrayIndexKey: Skeleton loaders are static, identical, and never reorder
+				<TodoItemSkeleton key={`skeleton-${i}`} />
 			))}
 		</div>
 	);
