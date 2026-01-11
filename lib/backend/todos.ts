@@ -95,6 +95,25 @@ function doesTodoMatchFilter(
 	return true;
 }
 
+// Reusable mutation functions for offline persistence
+export async function createTodoCall(todo: NewTodo): Promise<Todo> {
+	const response = await axios.post<Todo>("/api/todos", todo);
+	return response.data;
+}
+
+export async function updateTodoCall(
+	params: UpdateTodo & { id: number },
+): Promise<Todo> {
+	const { id, ...todo } = params;
+	const response = await axios.patch<Todo>(`/api/todos/${id}`, todo);
+	return response.data;
+}
+
+export async function deleteTodoCall(id: number): Promise<Todo> {
+	const response = await axios.delete<Todo>(`/api/todos/${id}`);
+	return response.data;
+}
+
 export function useCreateTodo() {
 	const queryClient = useQueryClient();
 
@@ -116,10 +135,7 @@ export function useCreateTodo() {
 
 	return useMutation({
 		mutationKey: ["createTodo"],
-		mutationFn: async (todo: NewTodo) => {
-			const response = await axios.post<Todo>("/api/todos", todo);
-			return response.data;
-		},
+		mutationFn: createTodoCall,
 		onMutate: async (newTodo) => {
 			await queryClient.cancelQueries({ queryKey: ["todos"] });
 
@@ -184,10 +200,7 @@ export function useUpdateTodo() {
 
 	return useMutation({
 		mutationKey: ["updateTodo"],
-		mutationFn: async ({ id, ...todo }: UpdateTodo & { id: number }) => {
-			const response = await axios.patch<Todo>(`/api/todos/${id}`, todo);
-			return response.data;
-		},
+		mutationFn: updateTodoCall,
 		onMutate: async ({ id, ...updates }) => {
 			await queryClient.cancelQueries({ queryKey: ["todos"] });
 
@@ -237,10 +250,7 @@ export function useDeleteTodo() {
 
 	return useMutation({
 		mutationKey: ["deleteTodo"],
-		mutationFn: async (id: number) => {
-			const response = await axios.delete<Todo>(`/api/todos/${id}`);
-			return response.data;
-		},
+		mutationFn: deleteTodoCall,
 		onMutate: async (id) => {
 			await queryClient.cancelQueries({ queryKey: ["todos"] });
 

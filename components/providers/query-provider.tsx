@@ -9,6 +9,11 @@ import {
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 import { useEffect, useMemo, useState } from "react";
+import {
+	createTodoCall,
+	deleteTodoCall,
+	updateTodoCall,
+} from "@/lib/backend/todos";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -76,49 +81,15 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 		// Set mutation defaults for offline persistence
 		// This ensures mutations can be retried after app restart
 		queryClient.setMutationDefaults(["createTodo"], {
-			mutationFn: async (newTodo) => {
-				const response = await fetch("/api/todos", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(newTodo),
-				});
-				if (!response.ok) {
-					throw new Error(`Failed to create todo: ${response.statusText}`);
-				}
-				return response.json();
-			},
+			mutationFn: createTodoCall,
 		});
 
 		queryClient.setMutationDefaults(["updateTodo"], {
-			mutationFn: async ({
-				id,
-				...todo
-			}: {
-				id: number;
-				[key: string]: unknown;
-			}) => {
-				const response = await fetch(`/api/todos/${id}`, {
-					method: "PATCH",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(todo),
-				});
-				if (!response.ok) {
-					throw new Error(`Failed to update todo: ${response.statusText}`);
-				}
-				return response.json();
-			},
+			mutationFn: updateTodoCall,
 		});
 
 		queryClient.setMutationDefaults(["deleteTodo"], {
-			mutationFn: async (id: number) => {
-				const response = await fetch(`/api/todos/${id}`, {
-					method: "DELETE",
-				});
-				if (!response.ok) {
-					throw new Error(`Failed to delete todo: ${response.statusText}`);
-				}
-				return response.json();
-			},
+			mutationFn: deleteTodoCall,
 		});
 
 		// Resume paused mutations when coming back online
