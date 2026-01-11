@@ -72,6 +72,7 @@ export function MobileBottomBar() {
 		},
 	];
 
+	// Extract icon components (must be PascalCase variables to use as React components)
 	const TodayIcon = navItems[0].icon;
 	const InboxIcon = navItems[1].icon;
 	const FutureIcon = navItems[2].icon;

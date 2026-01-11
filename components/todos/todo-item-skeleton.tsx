@@ -13,7 +13,7 @@ export function TodoItemSkeleton() {
 				{/* Title skeleton */}
 				<Skeleton className="h-4 w-3/4" />
 
-				{/* Description skeleton (optional, shows on ~60% of items) */}
+				{/* Description skeleton - shown for consistency in loading state */}
 				<div className="flex flex-col gap-1">
 					<Skeleton className="h-3 w-full" />
 					<Skeleton className="h-3 w-5/6" />
