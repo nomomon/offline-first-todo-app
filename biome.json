@@ -16,7 +16,22 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"style": {
+				"noRestrictedImports": {
+					"level": "error",
+					"options": {
+						"paths": {
+							"@/lib/db": {
+								"message": "Do not import the raw db client outside lib/db. Use query functions from @/lib/db/queries/* instead."
+							},
+							"@/lib/db/index": {
+								"message": "Do not import the raw db client outside lib/db. Use query functions from @/lib/db/queries/* instead."
+							}
+						}
+					}
+				}
+			}
 		}
 	},
 	"javascript": {
@@ -36,5 +51,17 @@
 				"organizeImports": "on"
 			}
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["lib/db/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": "off"
+					}
+				}
+			}
+		}
+	]
 }

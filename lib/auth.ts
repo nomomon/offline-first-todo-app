@@ -1,12 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { compare, hash } from "bcryptjs";
-import { eq } from "drizzle-orm";
 import { getServerSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
-import db from "@/lib/db";
 import { addUser, getUserByEmail } from "@/lib/db/queries/users";
-import { usersTable } from "@/lib/db/schema";
 
 export const authOptions: NextAuthOptions = {
 	providers: [
