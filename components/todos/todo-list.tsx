@@ -23,6 +23,7 @@ export function TodoList({ filter }: TodoListProps) {
 	const { data: todos, isLoading, error } = useTodos(filter);
 	const isRestoring = useIsRestoring();
 	const [showCompleted, setShowCompleted] = useState(false);
+	const allowCreate = filter !== "upcoming" && filter !== "completed";
 
 	if (isLoading || isRestoring) {
 		return (
@@ -59,7 +60,9 @@ export function TodoList({ filter }: TodoListProps) {
 					<h3 className="font-medium text-lg text-foreground mb-1">
 						No tasks yet
 					</h3>
-					<p className="text-sm">Add a task below to get started!</p>
+					{allowCreate ? (
+						<p className="text-sm">Add a task below to get started!</p>
+					) : null}
 				</div>
 			)}
 
@@ -115,9 +118,11 @@ export function TodoList({ filter }: TodoListProps) {
 				</div>
 			)}
 
-			<div className="mt-6">
-				<AddTaskInline />
-			</div>
+			{allowCreate ? (
+				<div className="mt-6">
+					<AddTaskInline filter={filter} />
+				</div>
+			) : null}
 		</div>
 	);
 }

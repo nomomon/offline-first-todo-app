@@ -6,12 +6,20 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import type { TodoFilter } from "@/lib/db/repository/todos";
 import { useCreateTodo } from "@/lib/todos";
 import { cn } from "@/lib/utils";
 import { PrioritySelect } from "./priority-select";
 import { SmartDatePicker } from "./smart-date-picker";
 
-export function AddTaskInline() {
+interface AddTaskInlineProps {
+	filter?: TodoFilter;
+}
+
+export function AddTaskInline({ filter }: AddTaskInlineProps) {
+	const allowCreate = filter !== "upcoming" && filter !== "completed";
+	const defaultDate = filter === "today" ? new Date() : undefined;
+
 	const [isEditing, setIsEditing] = useState(false);
 	const [content, setContent] = useState("");
 	const [description, setDescription] = useState("");
@@ -23,7 +31,7 @@ export function AddTaskInline() {
 	const resetForm = () => {
 		setContent("");
 		setDescription("");
-		setDate(undefined);
+		setDate(defaultDate);
 		setPriority(4);
 	};
 
@@ -67,11 +75,16 @@ export function AddTaskInline() {
 		}
 	};
 
+	if (!allowCreate) return null;
+
 	if (!isEditing) {
 		return (
 			<Button
 				variant="ghost"
-				onClick={() => setIsEditing(true)}
+				onClick={() => {
+					setDate(defaultDate);
+					setIsEditing(true);
+				}}
 				className="w-full justify-start gap-2 px-2 text-muted-foreground hover:text-primary group"
 			>
 				<div className="flex items-center justify-center w-6 h-6 rounded-full text-primary group-hover:bg-primary/10">
