@@ -4,7 +4,7 @@ import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import {
 	CacheFirst,
 	ExpirationPlugin,
-	NetworkFirst,
+	NetworkOnly,
 	Serwist,
 	StaleWhileRevalidate,
 } from "serwist";
@@ -38,6 +38,13 @@ const serwist = new Serwist({
 	// - Updates cache in background when online
 	// - Works fully offline after initial page visits cache content
 	runtimeCaching: [
+		// 0) Never cache API requests
+		{
+			matcher: ({ url, sameOrigin }) =>
+				sameOrigin && url.pathname.startsWith("/api/"),
+			handler: new NetworkOnly(),
+		},
+
 		// 1) App Router RSC responses (Next.js 13+ App Router)
 		{
 			matcher: ({ request, url: { pathname }, sameOrigin }) =>
@@ -104,26 +111,6 @@ const serwist = new Serwist({
 					new ExpirationPlugin({
 						maxEntries: 64,
 						maxAgeSeconds: SW_CACHE_TIME_SEVEN_DAYS_S, // 7 days
-					}),
-				],
-				matchOptions: {
-					ignoreVary: true,
-				},
-			}),
-		},
-
-		// 5) General API GET requests
-		{
-			matcher: ({ url, sameOrigin, request }) =>
-				sameOrigin &&
-				url.pathname.startsWith("/api/") &&
-				request.method === "GET",
-			handler: new NetworkFirst({
-				cacheName: "api-data",
-				plugins: [
-					new ExpirationPlugin({
-						maxEntries: 50,
-						maxAgeSeconds: SW_CACHE_TIME_ONE_DAY_S, // 1 day
 					}),
 				],
 				matchOptions: {
