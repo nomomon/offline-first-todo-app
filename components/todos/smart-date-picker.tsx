@@ -10,7 +10,6 @@ import {
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
 import {
 	Popover,
 	PopoverContent,
@@ -31,7 +30,6 @@ export function SmartDatePicker({
 	children,
 }: SmartDatePickerProps) {
 	const [open, setOpen] = React.useState(false);
-	const [inputValue, setInputValue] = React.useState("");
 
 	const handleSelect = (newDate?: Date) => {
 		setDate(newDate);
@@ -86,14 +84,6 @@ export function SmartDatePicker({
 				)}
 			</PopoverTrigger>
 			<PopoverContent className="w-63 p-0" align="start">
-				<div className="p-2 border-b border-border">
-					<Input
-						placeholder="Type a date..."
-						className="border-none shadow-none focus-visible:ring-0 h-8"
-						value={inputValue}
-						onChange={(e) => setInputValue(e.target.value)}
-					/>
-				</div>
 				<div className="p-1 flex flex-col">
 					{quickOptions.map((option) => (
 						<Button
