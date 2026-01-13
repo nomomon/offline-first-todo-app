@@ -9,7 +9,7 @@ import {
 	lte,
 	type SQL,
 } from "drizzle-orm";
-import db from "..";
+import db from "../client";
 import { todosTable } from "../schema";
 
 export type TodoFilter = "inbox" | "today" | "upcoming" | "completed";

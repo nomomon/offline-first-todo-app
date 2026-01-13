@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth";
-import { getTodoCounts } from "@/lib/db/queries/todos";
+import { getTodoCounts } from "@/lib/db/repository/todos";
 
 export async function GET() {
 	const user = await getAuthenticatedUser();

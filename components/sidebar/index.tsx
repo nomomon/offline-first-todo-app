@@ -19,7 +19,7 @@ import {
 	SidebarRail,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import type { TodoFilter } from "@/lib/db/queries/todos";
+import type { TodoFilter } from "@/lib/db/repository/todos";
 import { fetchTodos, useTodoCounts } from "@/lib/todos";
 import { AddTaskButton } from "./add-task";
 

@@ -22,11 +22,8 @@
 					"level": "error",
 					"options": {
 						"paths": {
-							"@/lib/db": {
-								"message": "Do not import the raw db client outside lib/db. Use query functions from @/lib/db/queries/* instead."
-							},
-							"@/lib/db/index": {
-								"message": "Do not import the raw db client outside lib/db. Use query functions from @/lib/db/queries/* instead."
+							"@/lib/db/client": {
+								"message": "Do not import the raw db client outside of the db layer. Use repository functions instead (`@/lib/db/repository/...`).\n"
 							}
 						}
 					}

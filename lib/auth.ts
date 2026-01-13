@@ -3,7 +3,7 @@ import { compare, hash } from "bcryptjs";
 import { getServerSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
-import { addUser, getUserByEmail } from "@/lib/db/queries/users";
+import { addUser, getUserByEmail } from "@/lib/db/repository/users";
 
 export const authOptions: NextAuthOptions = {
 	providers: [

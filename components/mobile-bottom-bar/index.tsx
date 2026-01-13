@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CreateTodoDialog } from "@/components/todos/create-todo-dialog";
 import { Button } from "@/components/ui/button";
-import type { TodoFilter } from "@/lib/db/queries/todos";
+import type { TodoFilter } from "@/lib/db/repository/todos";
 import { fetchTodos } from "@/lib/todos";
 import { cn } from "@/lib/utils";
 

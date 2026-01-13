@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth";
-import { addTodo, getTodos, type TodoFilter } from "@/lib/db/queries/todos";
+import { addTodo, getTodos, type TodoFilter } from "@/lib/db/repository/todos";
 
 export async function GET(request: Request) {
 	const user = await getAuthenticatedUser();

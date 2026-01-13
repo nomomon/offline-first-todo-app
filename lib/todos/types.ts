@@ -1,4 +1,4 @@
-import type { TodoFilter } from "@/lib/db/queries/todos";
+import type { TodoFilter } from "@/lib/db/repository/todos";
 import type { todosTable } from "@/lib/db/schema";
 
 export type Todo = typeof todosTable.$inferSelect;

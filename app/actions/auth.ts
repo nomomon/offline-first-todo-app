@@ -1,7 +1,7 @@
 "use server";
 
 import { hash } from "bcryptjs";
-import { addUser, getUserByEmail } from "@/lib/db/queries/users";
+import { addUser, getUserByEmail } from "@/lib/db/repository/users";
 
 export async function signUp(formData: FormData) {
 	const name = formData.get("name") as string;

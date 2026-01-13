@@ -1,4 +1,4 @@
-import db from "..";
+import db from "../client";
 
 async function dropDatabase() {
 	await db.execute(`DROP TABLE IF EXISTS "users";`);

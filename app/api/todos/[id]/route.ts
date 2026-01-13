@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth";
-import { deleteTodo, updateTodo } from "@/lib/db/queries/todos";
+import { deleteTodo, updateTodo } from "@/lib/db/repository/todos";
 
 export async function PATCH(
 	request: Request,
