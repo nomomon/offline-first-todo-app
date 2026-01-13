@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsRestoring } from "@tanstack/react-query";
 import {
 	CheckCircle2,
 	ChevronDown,
@@ -20,9 +21,10 @@ interface TodoListProps {
 
 export function TodoList({ filter }: TodoListProps) {
 	const { data: todos, isLoading, error } = useTodos(filter);
+	const isRestoring = useIsRestoring();
 	const [showCompleted, setShowCompleted] = useState(false);
 
-	if (isLoading) {
+	if (isLoading || isRestoring) {
 		return (
 			<div className="flex flex-col">
 				<TodoListSkeleton count={5} />
