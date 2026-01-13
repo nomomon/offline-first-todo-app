@@ -8,7 +8,7 @@ import {
 	PersistQueryClientProvider,
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	createTodoCall,
 	deleteTodoCall,
@@ -18,31 +18,33 @@ import {
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
 type PersistOptions = Omit<PersistQueryClientOptions, "queryClient">;
-type PersistedStorage = NonNullable<PersistOptions["persister"]>;
 
-const createNoopPersister = (): PersistedStorage => ({
-	persistClient: async () => undefined,
-	restoreClient: async () => undefined,
-	removeClient: async () => undefined,
+const persister = createAsyncStoragePersister({
+	storage: {
+		getItem: async (storageKey) => {
+			const value = await get<string | null>(storageKey);
+			return value ?? null;
+		},
+		setItem: async (storageKey, value) => {
+			await set(storageKey, value);
+		},
+		removeItem: async (storageKey) => {
+			await del(storageKey);
+		},
+	},
+	key: "react-query-cache",
 });
 
-const createIDBPersister = (key = "offline-first-react-query-cache") =>
-	createAsyncStoragePersister({
-		storage: {
-			getItem: async (storageKey) => {
-				const value = await get<string | null>(storageKey);
-				return value ?? null;
-			},
-			setItem: async (storageKey, value) => {
-				await set(storageKey, value);
-			},
-			removeItem: async (storageKey) => {
-				await del(storageKey);
-			},
-		},
-		key,
-		throttleTime: 1000,
-	});
+const persistOptions: PersistOptions = {
+	persister,
+	maxAge: DAY_IN_MS,
+	buster: "offline-first-cache-v1",
+	dehydrateOptions: {
+		// Persist every query and mutation so we survive offline restarts.
+		shouldDehydrateQuery: () => true,
+		shouldDehydrateMutation: () => true,
+	},
+};
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
 	const [queryClient] = useState(
@@ -69,14 +71,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 			}),
 	);
 
-	const [persister, setPersister] = useState<PersistedStorage>(() =>
-		createNoopPersister(),
-	);
-
 	useEffect(() => {
 		if (typeof window === "undefined") return;
-
-		setPersister(createIDBPersister());
 
 		// Set mutation defaults for offline persistence
 		// This ensures mutations can be retried after app restart
@@ -100,20 +96,6 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 		window.addEventListener("online", handleOnline);
 		return () => window.removeEventListener("online", handleOnline);
 	}, [queryClient]);
-
-	const persistOptions = useMemo<PersistOptions>(
-		() => ({
-			persister,
-			maxAge: DAY_IN_MS,
-			buster: "offline-first-cache-v1",
-			dehydrateOptions: {
-				// Persist every query and mutation so we survive offline restarts.
-				shouldDehydrateQuery: () => true,
-				shouldDehydrateMutation: () => true,
-			},
-		}),
-		[persister],
-	);
 
 	return (
 		<PersistQueryClientProvider
