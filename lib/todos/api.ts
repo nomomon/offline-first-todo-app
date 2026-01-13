@@ -25,14 +25,14 @@ export async function createTodo(todo: NewTodo): Promise<Todo> {
 }
 
 export async function updateTodo(
-	params: UpdateTodo & { id: number },
+	params: UpdateTodo & { id: string },
 ): Promise<Todo> {
 	const { id, ...todo } = params;
 	const response = await axios.patch<Todo>(`/api/todos/${id}`, todo);
 	return response.data;
 }
 
-export async function deleteTodo(id: number): Promise<Todo> {
+export async function deleteTodo(id: string): Promise<Todo> {
 	const response = await axios.delete<Todo>(`/api/todos/${id}`);
 	return response.data;
 }

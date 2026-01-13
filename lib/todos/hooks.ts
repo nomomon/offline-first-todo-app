@@ -60,6 +60,9 @@ export function useCreateTodo() {
 		mutationKey: createTodoMutationKey,
 		mutationFn: createTodo,
 		onMutate: async (newTodo: NewTodo) => {
+			const todoId = newTodo.id ?? crypto.randomUUID();
+			newTodo.id = todoId;
+
 			await queryClient.cancelQueries({ queryKey: ["todos"] });
 			const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
 
@@ -67,8 +70,8 @@ export function useCreateTodo() {
 				if (!doesTodoMatchView(newTodo, view)) return old;
 
 				const optimisticTodo: Todo = {
-					id: Math.random(),
-					userId: 0,
+					id: todoId,
+					userId: "",
 					createdAt: new Date(),
 					isCompleted: false,
 					dueDate: null,
@@ -107,7 +110,7 @@ export function useUpdateTodo() {
 	return useMutation({
 		mutationKey: updateTodoMutationKey,
 		mutationFn: updateTodo,
-		onMutate: async ({ id, ...updates }: UpdateTodo & { id: number }) => {
+		onMutate: async ({ id, ...updates }: UpdateTodo & { id: string }) => {
 			await queryClient.cancelQueries({ queryKey: ["todos"] });
 			const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
 
@@ -147,7 +150,7 @@ export function useDeleteTodo() {
 	return useMutation({
 		mutationKey: deleteTodoMutationKey,
 		mutationFn: deleteTodo,
-		onMutate: async (id: number) => {
+		onMutate: async (id: string) => {
 			await queryClient.cancelQueries({ queryKey: ["todos"] });
 			const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
 

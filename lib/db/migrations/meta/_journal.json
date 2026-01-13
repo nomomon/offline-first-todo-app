@@ -15,6 +15,13 @@
 			"when": 1767563482366,
 			"tag": "0001_dashing_mauler",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1768329634162,
+			"tag": "0002_tiny_kinsey_walden",
+			"breakpoints": true
 		}
 	]
 }

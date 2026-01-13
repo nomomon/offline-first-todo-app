@@ -14,7 +14,7 @@ import { todosTable } from "../schema";
 
 export type TodoFilter = "inbox" | "today" | "upcoming" | "completed";
 
-export async function getTodoCounts(userId: number) {
+export async function getTodoCounts(userId: string) {
 	const today = new Date().toISOString().split("T")[0];
 
 	const [inbox] = await db
@@ -65,7 +65,7 @@ export async function getTodoCounts(userId: number) {
 	};
 }
 
-export async function getTodos(userId: number, filter?: TodoFilter) {
+export async function getTodos(userId: string, filter?: TodoFilter) {
 	const conditions: (SQL | undefined)[] = [eq(todosTable.userId, userId)];
 	const today = new Date().toISOString().split("T")[0];
 
@@ -99,8 +99,8 @@ export async function addTodo(todo: typeof todosTable.$inferInsert) {
 }
 
 export async function updateTodo(
-	id: number,
-	userId: number,
+	id: string,
+	userId: string,
 	todo: Partial<typeof todosTable.$inferInsert>,
 ) {
 	return db
@@ -110,7 +110,7 @@ export async function updateTodo(
 		.returning();
 }
 
-export async function deleteTodo(id: number, userId: number) {
+export async function deleteTodo(id: string, userId: string) {
 	return db
 		.delete(todosTable)
 		.where(and(eq(todosTable.id, id), eq(todosTable.userId, userId)))

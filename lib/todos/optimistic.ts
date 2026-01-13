@@ -44,7 +44,7 @@ const compareTodos = (a: Todo, b: Todo) => {
 
 	if (aCreated !== bCreated) return bCreated - aCreated;
 
-	return a.id - b.id;
+	return a.id.localeCompare(b.id);
 };
 
 export const sortTodos = (todos: Todo[] | undefined) =>

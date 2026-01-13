@@ -7,20 +7,14 @@ import {
 	time,
 	timestamp,
 	unique,
+	uuid,
 	varchar,
 } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable(
 	"users",
 	{
-		id: integer().primaryKey().generatedAlwaysAsIdentity({
-			name: "users_id_seq",
-			startWith: 1,
-			increment: 1,
-			minValue: 1,
-			maxValue: 2147483647,
-			cache: 1,
-		}),
+		id: uuid("id").primaryKey().defaultRandom(),
 		name: varchar({ length: 255 }).notNull(),
 		email: varchar({ length: 255 }).notNull(),
 		password: varchar({ length: 255 }).notNull(),
@@ -29,15 +23,8 @@ export const usersTable = pgTable(
 );
 
 export const todosTable = pgTable("todos", {
-	id: integer().primaryKey().generatedAlwaysAsIdentity({
-		name: "todos_id_seq",
-		startWith: 1,
-		increment: 1,
-		minValue: 1,
-		maxValue: 2147483647,
-		cache: 1,
-	}),
-	userId: integer("user_id")
+	id: uuid("id").primaryKey().defaultRandom(),
+	userId: uuid("user_id")
 		.notNull()
 		.references(() => usersTable.id),
 	content: text("content").notNull(),

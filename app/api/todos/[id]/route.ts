@@ -14,7 +14,7 @@ export async function PATCH(
 	const { id } = await params;
 	const body = await request.json();
 
-	const updated = await updateTodo(Number(id), user.id, body);
+	const updated = await updateTodo(id, user.id, body);
 	return NextResponse.json(updated[0]);
 }
 
@@ -28,6 +28,6 @@ export async function DELETE(
 	}
 
 	const { id } = await params;
-	const deleted = await deleteTodo(Number(id), user.id);
+	const deleted = await deleteTodo(id, user.id);
 	return NextResponse.json(deleted[0]);
 }

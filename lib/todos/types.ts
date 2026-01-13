@@ -4,7 +4,7 @@ import type { todosTable } from "@/lib/db/schema";
 export type Todo = typeof todosTable.$inferSelect;
 export type NewTodo = Omit<
 	typeof todosTable.$inferInsert,
-	"id" | "userId" | "createdAt"
+	"userId" | "createdAt"
 >;
 export type UpdateTodo = Partial<NewTodo>;
 
