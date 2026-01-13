@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useCreateTodo } from "@/lib/backend/todos";
+import { useCreateTodo } from "@/lib/todos";
 import { cn } from "@/lib/utils";
 import { PrioritySelect } from "./priority-select";
 import { SmartDatePicker } from "./smart-date-picker";

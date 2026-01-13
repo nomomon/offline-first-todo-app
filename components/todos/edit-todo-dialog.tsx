@@ -8,7 +8,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { type Todo, useUpdateTodo } from "@/lib/backend/todos";
+import { type Todo, useUpdateTodo } from "@/lib/todos";
 import { TodoForm, type TodoFormValues } from "./todo-form";
 
 interface EditTodoDialogProps {

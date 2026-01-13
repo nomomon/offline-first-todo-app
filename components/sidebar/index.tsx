@@ -19,8 +19,8 @@ import {
 	SidebarRail,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import { fetchTodos, useTodoCounts } from "@/lib/backend/todos";
 import type { TodoFilter } from "@/lib/db/queries/todos";
+import { fetchTodos, useTodoCounts } from "@/lib/todos";
 import { AddTaskButton } from "./add-task";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

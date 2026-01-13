@@ -116,20 +116,3 @@ export async function deleteTodo(id: number, userId: number) {
 		.where(and(eq(todosTable.id, id), eq(todosTable.userId, userId)))
 		.returning();
 }
-
-export async function toggleTodo(id: number, userId: number) {
-	const [todo] = await db
-		.select({ isCompleted: todosTable.isCompleted })
-		.from(todosTable)
-		.where(and(eq(todosTable.id, id), eq(todosTable.userId, userId)));
-
-	if (!todo) {
-		throw new Error("Todo not found");
-	}
-
-	return db
-		.update(todosTable)
-		.set({ isCompleted: !todo.isCompleted })
-		.where(and(eq(todosTable.id, id), eq(todosTable.userId, userId)))
-		.returning();
-}

@@ -3,7 +3,7 @@
 
 import { Calendar, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { type Todo, useDeleteTodo, useUpdateTodo } from "@/lib/backend/todos";
+import { type Todo, useDeleteTodo, useUpdateTodo } from "@/lib/todos";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";

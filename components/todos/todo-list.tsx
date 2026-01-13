@@ -8,8 +8,8 @@ import {
 	ClipboardList,
 } from "lucide-react";
 import { useState } from "react";
-import { useTodos } from "@/lib/backend/todos";
 import type { TodoFilter } from "@/lib/db/queries/todos";
+import { useTodos } from "@/lib/todos";
 import { Button } from "../ui/button";
 import { AddTaskInline } from "./add-task-inline";
 import { TodoItem } from "./todo-item";

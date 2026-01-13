@@ -7,11 +7,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import localforage from "localforage";
 import { useEffect, useState } from "react";
 
-import {
-	createTodoCall,
-	deleteTodoCall,
-	updateTodoCall,
-} from "@/lib/backend/todos";
+import { createTodo, deleteTodo, updateTodo } from "@/lib/todos";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -35,15 +31,15 @@ function registerOfflineMutationDefaults(queryClient: QueryClient) {
 	// Persisted mutations don't persist their mutationFn.
 	// Register defaults so paused mutations can resume after a reload.
 	queryClient.setMutationDefaults(["createTodo"], {
-		mutationFn: createTodoCall,
+		mutationFn: createTodo,
 	});
 
 	queryClient.setMutationDefaults(["updateTodo"], {
-		mutationFn: updateTodoCall,
+		mutationFn: updateTodo,
 	});
 
 	queryClient.setMutationDefaults(["deleteTodo"], {
-		mutationFn: deleteTodoCall,
+		mutationFn: deleteTodo,
 	});
 }
 

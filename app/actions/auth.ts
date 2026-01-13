@@ -1,9 +1,7 @@
 "use server";
 
 import { hash } from "bcryptjs";
-import { eq } from "drizzle-orm";
-import db from "@/lib/db";
-import { usersTable } from "@/lib/db/schema";
+import { addUser, getUserByEmail } from "@/lib/db/queries/users";
 
 export async function signUp(formData: FormData) {
 	const name = formData.get("name") as string;
@@ -15,20 +13,16 @@ export async function signUp(formData: FormData) {
 	}
 
 	// Check if user already exists
-	const existingUser = await db
-		.select()
-		.from(usersTable)
-		.where(eq(usersTable.email, email))
-		.limit(1);
+	const existingUser = await getUserByEmail(email);
 
-	if (existingUser.length > 0) {
+	if (existingUser) {
 		return { error: "User already exists" };
 	}
 
 	const hashedPassword = await hash(password, 10);
 
 	try {
-		await db.insert(usersTable).values({
+		await addUser({
 			name,
 			email,
 			password: hashedPassword,

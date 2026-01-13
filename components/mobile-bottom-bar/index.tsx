@@ -6,8 +6,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CreateTodoDialog } from "@/components/todos/create-todo-dialog";
 import { Button } from "@/components/ui/button";
-import { fetchTodos } from "@/lib/backend/todos";
 import type { TodoFilter } from "@/lib/db/queries/todos";
+import { fetchTodos } from "@/lib/todos";
 import { cn } from "@/lib/utils";
 
 export function MobileBottomBar() {
@@ -64,7 +64,7 @@ export function MobileBottomBar() {
 	const ArchiveIcon = archiveNav.icon;
 
 	return (
-		<div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+		<div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
 			<nav className="flex items-center justify-around h-16 px-2">
 				{/* Today */}
 				<Link

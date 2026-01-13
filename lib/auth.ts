@@ -5,7 +5,7 @@ import { getServerSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
 import db from "@/lib/db";
-import { getUserByEmail } from "@/lib/db/queries/users";
+import { addUser, getUserByEmail } from "@/lib/db/queries/users";
 import { usersTable } from "@/lib/db/schema";
 
 export const authOptions: NextAuthOptions = {
@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
 			const placeholderPassword = await hash(randomUUID(), 10);
 
 			try {
-				await db.insert(usersTable).values({
+				await addUser({
 					name:
 						user.name ||
 						(profile as { name?: string } | null)?.name ||

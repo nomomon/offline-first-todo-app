@@ -10,7 +10,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCreateTodo } from "@/lib/backend/todos";
+import { useCreateTodo } from "@/lib/todos";
 import { TodoForm, type TodoFormValues } from "./todo-form";
 
 interface CreateTodoDialogProps {
