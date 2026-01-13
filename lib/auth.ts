@@ -25,17 +25,11 @@ export const authOptions: NextAuthOptions = {
 					return null;
 				}
 
-				const users = await db
-					.select()
-					.from(usersTable)
-					.where(eq(usersTable.email, credentials.email))
-					.limit(1);
+				const user = await getUserByEmail(credentials.email);
 
-				if (users.length === 0) {
+				if (!user) {
 					return null;
 				}
-
-				const user = users[0];
 
 				const isPasswordValid = await compare(
 					credentials.password,
@@ -68,13 +62,9 @@ export const authOptions: NextAuthOptions = {
 				return false;
 			}
 
-			const existing = await db
-				.select()
-				.from(usersTable)
-				.where(eq(usersTable.email, email))
-				.limit(1);
+			const existing = await getUserByEmail(email);
 
-			if (existing.length > 0) {
+			if (existing) {
 				return true;
 			}
 
