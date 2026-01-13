@@ -40,9 +40,21 @@ const persistOptions: PersistOptions = {
 	maxAge: DAY_IN_MS,
 	buster: "offline-first-cache-v1",
 	dehydrateOptions: {
-		// Persist every query and mutation so we survive offline restarts.
-		shouldDehydrateQuery: () => true,
-		shouldDehydrateMutation: () => true,
+		shouldDehydrateQuery: (query) => {
+			const qk = query.queryKey as unknown[];
+			const first = qk[0];
+			return ["todos", "todo-counts"].includes(first as string);
+		},
+		shouldDehydrateMutation: (mutation) => {
+			// Persist all paused mutations (offline)
+			if (mutation.state.isPaused) return true;
+
+			const mk = mutation.options.mutationKey;
+			const first = Array.isArray(mk) ? mk[0] : mk;
+			return ["createTodo", "updateTodo", "deleteTodo"].includes(
+				first as string,
+			);
+		},
 	},
 };
 
@@ -63,7 +75,19 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 					mutations: {
 						gcTime: DAY_IN_MS,
 						networkMode: "offlineFirst",
-						retry: 3,
+						retry: (failureCount, error: any) => {
+							if (failureCount >= 3) {
+								return false;
+							}
+							// Don't retry 4xx errors (client fault), only network/5xx
+							if (
+								error?.response?.status >= 400 &&
+								error?.response?.status < 500
+							) {
+								return false;
+							}
+							return true;
+						},
 						retryDelay: (attemptIndex) =>
 							Math.min(1000 * 2 ** attemptIndex, 30000),
 					},
