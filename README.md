@@ -28,7 +28,9 @@ One also might ask, why not a mobile app? Which is a valid question, considering
 
 While making the app, I saw that the TanstackQuery example for query persistance actually had a service worker which is kinda similar. However, they did a barebone SW setup, while I used Serwist.
 
-## Building the App
+## Part 0. Building the App
+
+Won't go too much in depth. This will be a standard setup. If you are using this as a guide, I assume you already have the app built, and are looking for the offline part.
 
 My stack:
 - Frontend:
@@ -45,3 +47,11 @@ My stack:
     - Biome (linting, formatting)
     - pnpm 
     - typescript
+
+From the "building the UI" perspective, this app is basically just assembling a bunch of small components and wiring them together. I used Shadcn UI as the base (buttons, dialogs, inputs, etc) and then built the todo-specific pieces on top (create/edit dialogs, date picker, priority select, list item skeletons). Next’s `app/` router made it pretty clean to split layouts (auth vs app) and keep the page components thin — most of the real work sits in `components/` and `lib/`.
+
+==The communication with the backend is handled with TanStack Query. Apart from the basic setup, I made sure that the queries have proper optimistic updates and cache invalidations, so the UI feels snappy and always in sync with the server state. This allows for a smooth UX even when offline, as the app can rely on the cached data.==
+
+On the backend side I tried to keep it boring: define the schema in Drizzle, write the small repository functions for users/todos, and expose them through Next.JS route handlers. Since it’s a CRUD app, the API is basically `GET/POST` for the collection and `PATCH/DELETE` for individual todos, plus a tiny counts route for the UI. Auth is handled with NextAuth, so the main job is just getting the session into the server routes and making sure every request is scoped to the current user.
+
+## Part 1. PWA, Service Worker with Serwist
