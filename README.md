@@ -26,9 +26,22 @@ One also might ask, why not a mobile app? Which is a valid question, considering
 - React Native sucks. There are development quirks around components, which are different from HTML, and writing UI doesn't translate 1:1 from HTML to Native. Also, the UX while using it doesn't feel native IMHO. In that regard, the PWA is extremely smooth, if made well.
 - I'm really well versed with React, and not bound to make native, so why not just stick to what I'm good at? 
 
+While making the app, I saw that the TanstackQuery example for query persistance actually had a service worker which is kinda similar. However, they did a barebone SW setup, while I used Serwist.
+
 ## Building the App
 
 My stack:
-- Next.JS (tailwindcss, typescript)
-- Biome (linting, formatting)
-- Shadcn UI (components)
+- Frontend:
+    - Next.JS
+    - Tailwind css
+    - Shadcn UI
+    - TanStack Query
+- Backend: 
+    - Next.JS api routes
+    - Postgres 
+    - Drizzle
+    - Next Auth
+- Misc:
+    - Biome (linting, formatting)
+    - pnpm 
+    - typescript
