@@ -111,11 +111,7 @@ export function TodoForm({
 							control={form.control}
 							name="priority"
 							render={({ field }) => (
-								<PrioritySelect
-									value={field.value}
-									onChange={field.onChange}
-									triggerClassName="h-7! px-2! font-medium rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50"
-								/>
+								<PrioritySelect value={field.value} onChange={field.onChange} />
 							)}
 						/>
 					</div>

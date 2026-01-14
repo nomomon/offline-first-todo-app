@@ -79,6 +79,7 @@ export function PrioritySelect({
 					buttonVariants({ variant: "outline", size: "sm" }),
 					"w-auto",
 					"py-0",
+					"h-7! px-2! font-medium rounded-md text-muted-foreground border-border hover:text-foreground hover:bg-muted/60",
 					triggerClassName,
 				)}
 			>

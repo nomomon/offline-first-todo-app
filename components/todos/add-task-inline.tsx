@@ -117,11 +117,7 @@ export function AddTaskInline({ filter }: AddTaskInlineProps) {
 					<div className="flex flex-wrap items-center gap-2">
 						<SmartDatePicker date={date} setDate={setDate} />
 
-						<PrioritySelect
-							value={priority}
-							onChange={setPriority}
-							triggerClassName="h-7! px-2! font-medium rounded-md text-muted-foreground border-border hover:text-foreground hover:bg-muted/60"
-						/>
+						<PrioritySelect value={priority} onChange={setPriority} />
 					</div>
 					<div className="flex flex-col-reverse w-full gap-2 sm:w-auto sm:flex-row sm:items-center">
 						<Button
