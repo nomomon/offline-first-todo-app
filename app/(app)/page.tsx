@@ -1,5 +1,3 @@
-"use client";
-
 import { useSearchParams } from "next/navigation";
 import { TodoList } from "@/components/todos/todo-list";
 import type { TodoFilter } from "@/lib/db/repository/todos";
@@ -17,8 +15,8 @@ const viewConfig: Record<TodoFilter, { title: string; description: string }> = {
 		title: "Upcoming",
 		description: "Preview the work that is scheduled next.",
 	},
-	completed: {
-		title: "Archive",
+	archived: {
+		title: "Archived",
 		description: "Browse the tasks you have closed out.",
 	},
 };

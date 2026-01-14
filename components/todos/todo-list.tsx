@@ -23,7 +23,7 @@ export function TodoList({ filter }: TodoListProps) {
 	const { data: todos, isLoading, error } = useTodos(filter);
 	const isRestoring = useIsRestoring();
 	const [showCompleted, setShowCompleted] = useState(false);
-	const allowCreate = filter !== "upcoming" && filter !== "completed";
+	const allowCreate = filter !== "upcoming" && filter !== "archived";
 
 	if (isLoading || isRestoring) {
 		return (

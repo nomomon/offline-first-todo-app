@@ -12,7 +12,7 @@ import {
 import db from "../client";
 import { todosTable } from "../schema";
 
-export type TodoFilter = "inbox" | "today" | "upcoming" | "completed";
+export type TodoFilter = "inbox" | "today" | "upcoming" | "archived";
 
 export async function getTodoCounts(userId: string) {
 	const today = new Date().toISOString().split("T")[0];
@@ -50,7 +50,7 @@ export async function getTodoCounts(userId: string) {
 			),
 		);
 
-	const [completed] = await db
+	const [archived] = await db
 		.select({ count: count() })
 		.from(todosTable)
 		.where(
@@ -61,7 +61,7 @@ export async function getTodoCounts(userId: string) {
 		inbox: inbox.count,
 		today: todayCount.count,
 		upcoming: upcoming.count,
-		completed: completed.count,
+		archived: archived.count,
 	};
 }
 
@@ -78,7 +78,7 @@ export async function getTodos(userId: string, filter?: TodoFilter) {
 	} else if (filter === "upcoming") {
 		// Show all tasks due in the future (both completed and incomplete)
 		conditions.push(gt(todosTable.dueDate, today));
-	} else if (filter === "completed") {
+	} else if (filter === "archived") {
 		conditions.push(eq(todosTable.isCompleted, true));
 	}
 

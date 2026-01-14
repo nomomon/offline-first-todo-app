@@ -13,7 +13,7 @@ export function doesTodoMatchView(
 	const dueDate = normalizeDate(todo.dueDate);
 	const today = new Date().toISOString().split("T")[0];
 
-	if (view === "completed") return isCompleted === true;
+	if (view === "archived") return isCompleted === true;
 
 	// Allow completed tasks to remain in their respective views
 	// based on due date, not just show only incomplete tasks

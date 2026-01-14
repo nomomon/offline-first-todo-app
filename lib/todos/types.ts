@@ -12,8 +12,8 @@ export type TodoCounts = {
 	inbox: number;
 	today: number;
 	upcoming: number;
-	completed: number;
+	archived: number;
 };
 
-// This is effectively a UI "view" filter (inbox/today/upcoming/completed)
+// This is effectively a UI "view" filter (inbox/today/upcoming/archived)
 export type TodoView = TodoFilter;

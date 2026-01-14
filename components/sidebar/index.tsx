@@ -59,18 +59,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				view: "today" as TodoFilter,
 			},
 			{
-				title: "Future",
+				title: "Upcoming",
 				url: "/?view=upcoming",
 				icon: CalendarDays,
 				count: counts?.upcoming ?? 0,
 				view: "upcoming" as TodoFilter,
 			},
 			{
-				title: "Archive",
-				url: "/?view=completed",
+				title: "Archived",
+				url: "/?view=archived",
 				icon: Archive,
-				count: counts?.completed ?? 0,
-				view: "completed" as TodoFilter,
+				count: counts?.archived ?? 0,
+				view: "archived" as TodoFilter,
 			},
 		],
 	};

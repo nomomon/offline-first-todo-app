@@ -16,7 +16,7 @@ interface AddTaskInlineProps {
 }
 
 export function AddTaskInline({ filter }: AddTaskInlineProps) {
-	const allowCreate = filter !== "upcoming" && filter !== "completed";
+	const allowCreate = filter !== "upcoming" && filter !== "archived";
 	const defaultDate = filter === "today" ? new Date() : undefined;
 
 	const [isEditing, setIsEditing] = useState(false);

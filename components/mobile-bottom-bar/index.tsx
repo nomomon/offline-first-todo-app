@@ -18,7 +18,7 @@ export function MobileBottomBar() {
 		viewParam === "today" ||
 		viewParam === "inbox" ||
 		viewParam === "upcoming" ||
-		viewParam === "completed"
+		viewParam === "archived"
 			? viewParam
 			: "today";
 
@@ -43,16 +43,16 @@ export function MobileBottomBar() {
 			view: "inbox" as TodoFilter,
 		},
 		{
-			label: "Future",
+			label: "Upcoming",
 			icon: CalendarDays,
 			href: "/?view=upcoming",
 			view: "upcoming" as TodoFilter,
 		},
 		{
-			label: "Archive",
+			label: "Archived",
 			icon: Archive,
-			href: "/?view=completed",
-			view: "completed" as TodoFilter,
+			href: "/?view=archived",
+			view: "archived" as TodoFilter,
 		},
 	];
 
@@ -107,7 +107,7 @@ export function MobileBottomBar() {
 					</Button>
 				</CreateTodoDialog>
 
-				{/* Future */}
+				{/* Upcoming */}
 				<Link
 					href={futureNav.href}
 					className={cn(
@@ -122,7 +122,7 @@ export function MobileBottomBar() {
 					<span className="text-xs font-medium">{futureNav.label}</span>
 				</Link>
 
-				{/* Archive */}
+				{/* Archived */}
 				<Link
 					href={archiveNav.href}
 					className={cn(
