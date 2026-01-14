@@ -48,6 +48,14 @@ My stack:
     - pnpm 
     - typescript
 
+Structurally, I tried to keep things very “Next-ish” and boring:
+
+- `app/` is just routing + layouts (route groups for auth vs app)
+- `components/` is the UI building blocks (thin pages, most logic in components)
+- `app/api/*` exposes the CRUD routes
+- `lib/db/*` is where the DB + repo-ish functions live
+- `components/providers/*` wires auth + theme + query persistence
+
 From the "building the UI" perspective, this app is basically just assembling a bunch of small components and wiring them together. I used Shadcn UI as the base (buttons, dialogs, inputs, etc) and then built the todo-specific pieces on top (create/edit dialogs, date picker, priority select, list item skeletons). Next’s `app/` router made it pretty clean to split layouts (auth vs app) and keep the page components thin — most of the real work sits in `components/` and `lib/`.
 
 ==The communication with the backend is handled with TanStack Query. Apart from the basic setup, I made sure that the queries have proper optimistic updates and cache invalidations, so the UI feels snappy and always in sync with the server state. This allows for a smooth UX even when offline, as the app can rely on the cached data.==
@@ -55,3 +63,169 @@ From the "building the UI" perspective, this app is basically just assembling a 
 On the backend side I tried to keep it boring: define the schema in Drizzle, write the small repository functions for users/todos, and expose them through Next.JS route handlers. Since it’s a CRUD app, the API is basically `GET/POST` for the collection and `PATCH/DELETE` for individual todos, plus a tiny counts route for the UI. Auth is handled with NextAuth, so the main job is just getting the session into the server routes and making sure every request is scoped to the current user.
 
 ## Part 1. PWA, Service Worker with Serwist
+
+Before the “how”, here’s the main idea of how this app is put together:
+
+- The service worker (Serwist) caches the **app shell**: HTML/RSC, JS/CSS, fonts, images. That’s what makes reloads work offline.
+- TanStack Query caches the **server state** and **requests** (mutations). That’s what keeps the UI usable when offline without me reinventing caching.
+
+Important detail: the SW in this repo intentionally **doesn’t cache** `/api/*`. If you cache API responses in the SW *and* you persist TanStack Query, you now have 2 different caches that can disagree, and you’ll chase ghosts.
+
+### 1) Install Serwist + wire it into Next
+
+First, install the packages:
+
+- `pnpm add @serwist/next`
+- `pnpm add -D serwist`
+
+Then follow the official Serwist Next.js guide (it stays up to date, and covers Turbopack quirks too):
+
+- Getting started: https://serwist.pages.dev/docs/next/getting-started
+- Configuring: https://serwist.pages.dev/docs/next/configuring
+- Turbopack notes: https://serwist.pages.dev/docs/next/turbo
+
+In this repo I run Next with webpack (`--webpack`), because the Serwist integration here is configured via `@serwist/next`.
+
+Now hook Serwist into Next config. This is the part that builds your SW into `public/sw.js`.
+
+```diff
+// next.config.ts
++import withSerwistInit from "@serwist/next";
++import type { NextConfig } from "next";
++
++const withSerwist = withSerwistInit({
++  swSrc: "app/sw.ts",
++  swDest: "public/sw.js",
++});
++
++const nextConfig: NextConfig = {
++  output: "standalone",
++};
++
++export default withSerwist(nextConfig);
+```
+
+Make sure to keep `swDest` inside `public/`, otherwise the browser won’t be able to fetch the worker.
+
+### 2) Add a basic Service Worker
+
+Then create the SW source file and define what you cache.
+
+```diff
+// app/sw.ts
++/// <reference lib="webworker" />
++import { PAGES_CACHE_NAME } from "@serwist/next/worker";
++import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
++import { CacheFirst, NetworkOnly, Serwist, StaleWhileRevalidate } from "serwist";
++
++declare global {
++  interface WorkerGlobalScope extends SerwistGlobalConfig {
++    __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
++  }
++}
++
++declare const self: ServiceWorkerGlobalScope;
++
++const serwist = new Serwist({
++  precacheEntries: self.__SW_MANIFEST,
++  skipWaiting: true,
++  clientsClaim: true,
++
++  runtimeCaching: [
++    // Don’t cache API by default. Let TanStack Query handle that layer.
++    {
++      matcher: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/api/"),
++      handler: new NetworkOnly(),
++    },
++
++    // Cache app shell so reload works offline.
++    {
++      matcher: ({ request, sameOrigin }) =>
++        request.headers.get("RSC") === "1" && sameOrigin,
++      handler: new StaleWhileRevalidate({ cacheName: PAGES_CACHE_NAME.rsc }),
++    },
++
++    // Icons/manifest/images are safe to cache-first.
++    {
++      matcher: ({ request }) => request.destination === "image" || request.destination === "manifest",
++      handler: new CacheFirst({ cacheName: "static-media" }),
++    },
++  ],
++});
++
++serwist.addEventListeners();
+```
+
+Make sure you don’t “over-cache” here. Caching HTML/RSC + static assets is what gives you offline reloads. Caching API is where you can accidentally ship stale data forever.
+
+### 3) Add the manifest
+
+Next, add a web manifest so the app is installable.
+
+```diff
+// app/manifest.json
++{
++  "name": "Offline First Todo",
++  "short_name": "Offline Todos",
++  "start_url": "/?source=pwa",
++  "scope": "/",
++  "display": "standalone",
++  "orientation": "portrait",
++  "background_color": "#f7f5f2",
++  "theme_color": "#c55b2e",
++  "icons": [
++    {
++      "src": "/icons/icon-192x192.png",
++      "sizes": "192x192",
++      "type": "image/png",
++      "purpose": "maskable"
++    },
++    {
++      "src": "/icons/icon-512x512.png",
++      "sizes": "512x512",
++      "type": "image/png"
++    }
++  ]
++}
+```
+
+After that, make sure the icon files actually exist in `public/icons/`, otherwise install prompts can get weird and Lighthouse will complain.
+
+### 4) Connect the manifest + PWA metadata in the layout
+
+Finally, expose the manifest and set the PWA-ish metadata. This is what makes browsers “see” your app as installable + sets theme colors.
+
+```diff
+// app/layout.tsx
++import type { Metadata, Viewport } from "next";
++
++const APP_NAME = "Offline First Todo";
++const APP_DEFAULT_TITLE = "Offline First Todo | Works without internet";
++const APP_TITLE_TEMPLATE = "%s | Offline First Todo";
++const APP_DESCRIPTION = "Offline-capable task manager...";
++
++export const metadata: Metadata = {
++  applicationName: APP_NAME,
++  title: { default: APP_DEFAULT_TITLE, template: APP_TITLE_TEMPLATE },
++  description: APP_DESCRIPTION,
++  manifest: "/manifest.json",
++  appleWebApp: {
++    capable: true,
++    statusBarStyle: "default",
++    title: APP_DEFAULT_TITLE,
++  },
++};
++
++export const viewport: Viewport = {
++  themeColor: [
++    { media: "(prefers-color-scheme: light)", color: "#f7f5f2" },
++    { media: "(prefers-color-scheme: dark)", color: "#1f1a18" },
++  ],
++};
+```
+
+Make sure to keep the manifest path as `"/manifest.json"`. In Next, `app/manifest.json` is exposed at that route.
+
+Finally: remember that service workers only work on HTTPS (or `localhost`). If you’re testing caching and things look “stuck”, unregister the SW / clear site data — stale SWs are classic.
+
+That’s it for the “PWA shell”. After this, you can focus on the “real offline part”: persisting queries and mutations with TanStack Query.
