@@ -1,8 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { Calendar } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -16,7 +14,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 import { PrioritySelect } from "./priority-select";
 import { SmartDatePicker } from "./smart-date-picker";
 
@@ -106,21 +103,7 @@ export function TodoForm({
 							control={form.control}
 							name="dueDate"
 							render={({ field }) => (
-								<SmartDatePicker date={field.value} setDate={field.onChange}>
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										className={cn(
-											"h-7 px-2 rounded-md text-gray-500 border-gray-200 hover:text-gray-700 hover:bg-gray-50",
-											field.value &&
-												"text-primary border-primary/20 bg-primary/5",
-										)}
-									>
-										<Calendar className="w-4 h-4 mr-1" />
-										{field.value ? format(field.value, "MMM d") : "Date"}
-									</Button>
-								</SmartDatePicker>
+								<SmartDatePicker date={field.value} setDate={field.onChange} />
 							)}
 						/>
 

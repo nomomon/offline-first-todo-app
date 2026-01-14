@@ -1,14 +1,13 @@
 "use client";
 
 import { format } from "date-fns";
-import { Calendar, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { TodoFilter } from "@/lib/db/repository/todos";
 import { useCreateTodo } from "@/lib/todos";
-import { cn } from "@/lib/utils";
 import { PrioritySelect } from "./priority-select";
 import { SmartDatePicker } from "./smart-date-picker";
 
@@ -116,20 +115,7 @@ export function AddTaskInline({ filter }: AddTaskInlineProps) {
 
 				<div className="flex flex-col gap-3 pt-2 mt-2 border-t border-border sm:flex-row sm:items-center sm:justify-between">
 					<div className="flex flex-wrap items-center gap-2">
-						<SmartDatePicker date={date} setDate={setDate}>
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								className={cn(
-									"h-7 px-2 rounded-md text-muted-foreground border-border hover:text-foreground hover:bg-muted/60",
-									date && "text-primary border-primary/20 bg-primary/5",
-								)}
-							>
-								<Calendar className="w-4 h-4 mr-1" />
-								{date ? format(date, "MMM d") : "Date"}
-							</Button>
-						</SmartDatePicker>
+						<SmartDatePicker date={date} setDate={setDate} />
 
 						<PrioritySelect
 							value={priority}

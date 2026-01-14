@@ -22,12 +22,16 @@ interface SmartDatePickerProps {
 	date?: Date;
 	setDate: (date?: Date) => void;
 	children?: React.ReactNode;
+	triggerClassName?: string;
+	placeholder?: string;
 }
 
 export function SmartDatePicker({
 	date,
 	setDate,
 	children,
+	triggerClassName,
+	placeholder = "Date",
 }: SmartDatePickerProps) {
 	const [open, setOpen] = React.useState(false);
 
@@ -70,17 +74,19 @@ export function SmartDatePicker({
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				{children || (
+				{children ?? (
 					<Button
+						type="button"
 						variant="outline"
 						size="sm"
 						className={cn(
-							"w-auto justify-start text-left font-normal",
-							!date && "text-muted-foreground",
+							"h-7 px-2 rounded-md text-muted-foreground border-border hover:text-foreground hover:bg-muted/60",
+							date && "text-primary border-primary/20 bg-primary/5",
+							triggerClassName,
 						)}
 					>
-						<CalendarIcon className="size-4" />
-						{date ? format(date, "PPP") : <span>Pick a date</span>}
+						<CalendarIcon className="w-4 h-4 mr-1" />
+						{date ? format(date, "MMM d") : placeholder}
 					</Button>
 				)}
 			</PopoverTrigger>
