@@ -1,7 +1,7 @@
 "use client";
 
 import { Flag } from "lucide-react";
-
+import { buttonVariants } from "@/components/ui/button";
 import {
 	Select,
 	SelectContent,
@@ -76,7 +76,9 @@ export function PrioritySelect({
 			<SelectTrigger
 				size="sm"
 				className={cn(
-					"h-8 w-auto border shadow-sm px-3 gap-2 focus:ring-0",
+					buttonVariants({ variant: "outline", size: "sm" }),
+					"w-auto",
+					"py-0",
 					triggerClassName,
 				)}
 			>

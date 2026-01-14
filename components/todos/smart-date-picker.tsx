@@ -72,13 +72,14 @@ export function SmartDatePicker({
 			<PopoverTrigger asChild>
 				{children || (
 					<Button
-						variant={"outline"}
+						variant="outline"
+						size="sm"
 						className={cn(
-							"justify-start text-left font-normal",
+							"w-auto justify-start text-left font-normal",
 							!date && "text-muted-foreground",
 						)}
 					>
-						<CalendarIcon className="mr-2 h-4 w-4" />
+						<CalendarIcon className="size-4" />
 						{date ? format(date, "PPP") : <span>Pick a date</span>}
 					</Button>
 				)}
