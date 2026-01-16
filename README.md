@@ -69,6 +69,7 @@ To begin, follow the default [Serwist setup guide](https://serwist.dev/docs/gett
 Afterwards, setup the `runtimeCaching` in the `sw.ts`. For an offline first app, I recommend to fully cache the app shell (HTML, CSS, JS) and static assets (images, fonts). This way, the app will load even when offline. Here's an example configuration:
 
 ```ts
+// app/sw.ts
 const serwist = new Serwist({
     ...
     runtimeCaching: [
@@ -110,3 +111,101 @@ Using the `maxAgeSeconds` setting allows you to control the maximum age of an en
 After a week of not visiting the app, and being offline, the app will not load until you go online once. You can set that config to a higher value if you want, but that depends on your use case.
 
 ## Part 2. Caching server state (Tanstack Query)
+
+To capture the server state, all the interactions with the backend were wrapped in the Tanstack Query hooks. For example, fetching the todo list is done using the `useQuery` hook, while creating, updating, and deleting todos are done using the `useMutation` hook.
+
+And then, reusing the same hooks in the components, this way you have a single place to control all the server interactions.
+
+To persist the query cache, we need to use `@tanstack/query-async-storage-persister`. This library allows us to store the query cache in an async storage, which works well with service workers.
+
+Here is the setup I used for the `QueryProvider`:
+
+```tsx
+// components/providers/query-provider.tsx
+
+const persister = createAsyncStoragePersister({
+    storage: localforage.createInstance({
+        name: "offline-first-todo-app",
+        storeName: "react-query",
+    }),
+});
+
+export function QueryProvider({ children }: { children: React.ReactNode }) {
+    // ... setup queryClient ...
+
+    return (
+        <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{
+                persister,
+                maxAge: DAY_IN_MS,
+            }}
+            onSuccess={() => {
+                // Resume any paused mutations after state is restored
+                queryClient.resumePausedMutations().then(() => {
+                    queryClient.invalidateQueries();
+                });
+            }}
+        >
+            {children}
+        </PersistQueryClientProvider>
+    );
+}
+```
+
+The main difference from a "standard" setup covers three areas:
+
+1. **Storage**: I used `localforage` (a wrapper around IndexedDB) creates the persistent layer. This is where your data lives when you close the tab.
+2. **The Provider**: Instead of the standard `QueryClientProvider`, I switched to `PersistQueryClientProvider`. It handles the hydration of the cache from storage automatically on boot. 
+3. **Resuming**: The `onSuccess` callback is crucial. Once the cache is restored from disk, `resumePausedMutations` kicks any pending changes that were stuck in the "offline" queue back into motion.
+
+### Handling "Offline First" defaults
+
+Just persisting data isn't enough; you need to tell TanStack Query to be chill about network failures.
+
+```tsx
+new QueryClient({
+    defaultOptions: {
+        queries: {
+            networkMode: "offlineFirst", // <--- important
+            gcTime: DAY_IN_MS, // Keep unused data in memory/cache for 24h
+            staleTime: 5 * 60 * 1000, // Data is "fresh" for 5 mins
+            refetchOnMount: false, 
+            retry: 1, 
+        },
+        mutations: {
+            networkMode: "offlineFirst",
+        },
+    },
+})
+```
+
+Setting `networkMode: "offlineFirst"` is the most critical part. By default, TanStack Query pauses completely if it thinks you are offline. This mode allows it to run queries against the cache and verify they exist, returning data even if the browser says "No Internet".
+
+### Setting up Mutations
+
+There is one annoying quirk: you can't serialize functions to local storage. This means if you queue a mutation (like "Add Todo") and reload the page, the *data* for the mutation is there, but the *function* to execute it is gone.
+
+To fix this, you have to manually map the mutation keys back to their functions on initialization:
+
+```tsx
+function registerOfflineMutationDefaults(queryClient: QueryClient) {
+    // Re-attach the actual API functions to the mutation keys
+    queryClient.setMutationDefaults(["createTodo"], {
+        mutationFn: createTodo,
+    });
+    // ... repeat for update/delete
+}
+```
+
+If you forget this, your pending mutations will stay pending forever because they don't know what code to run.
+
+### Optimistic UI
+
+Since we are "offline-first", waiting for the server to confirm a "Create Todo" action feels broken if you have no connection. If we didn't do anything, the user would click save, the dialog would close, but the list wouldn't update until the background sync finishes (which might be hours later).
+
+To fix this, I used Optimistic Updates. This means we manually update the local cache immediately when the user clicks save, assuming success. This is crucial for offline apps because it allows the user to keep working ("maintain state") without waiting for network activity. If the mutation fails later (really fails, not just offline), we roll back. This makes the app feel instant and native. You can check the [official Optimistic Updates guide](https://tanstack.com/query/latest/docs/framework/react/guides/optimistic-updates) for the implementation details.
+
+## Conclusion
+
+Using these two libraries together made building an offline-first app much easier than I expected. Serwist handled all the service worker complexities, while TanStack Query took care of caching and syncing server state. The result is a smooth, reliable PWA that works seamlessly even without an internet connection.
