@@ -1,196 +1,138 @@
-# Building an Offline-First Todo App with Serwist and TanStack Query
+<a id="readme-top"></a>
 
-I recently built a warehouse app in rural Kazakhstan. The job was simple: scan products, tag their locations, sync to a server. Standard CRUD. The catch: internet was unreliable or nonexistent in parts of the building.
+<br />
+<div align="center">
+  <a href="https://github.com/nomomon/offline-first-todo-app">
+    <img src="public/icons/icon-192x192.png" alt="Logo" width="80" height="80">
+  </a>
 
-The app had to:
-1. Load and function with no network (even after a refresh)
-2. Cache data fetched from the server
-3. Queue mutations and replay them when back online
+<h3 align="center">Offline First Todo App</h3>
 
-I've used service workers and TanStack Query separately before, but combining them for true offline-first was new territory. I couldn't find a tutorial that covered both, so here's mine.
+  <p align="center">
+    A robust, offline-capable task manager built for unreliable network conditions using Next.js, Serwist, and TanStack Query.
+    <br />
+    <br />
+    <a href="https://nomomon.xyz/posts/offline-first-pwa-tutorial"><strong>Read the Tutorial »</strong></a>
+    <br />
+    <br />
+    <a href="https://todo.nomomon.xyz">View Demo</a>
+    &middot;
+    <a href="https://github.com/nomomon/offline-first-todo-app/issues">Report Bug</a>
+    &middot;
+    <a href="https://github.com/nomomon/offline-first-todo-app/issues">Request Feature</a>
+  </p>
+</div>
 
-**Stack:**
-- **Frontend:** Next.js, TanStack Query, Tailwind, Shadcn UI
-- **Backend:** Next.js API routes, Postgres, Drizzle, NextAuth
-- **Offline:** Serwist (service worker), TanStack Query Persister
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#about-the-project">About The Project</a></li>
+    <li><a href="#tech-stack">Tech Stack</a></li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+  </ol>
+</details>
 
-The nice thing: Serwist handles requirement #1 (app shell caching), and TanStack Query handles #2 and #3 (server state + mutation queue). They don't step on each other.
+## About The Project
 
----
+This project was born out of necessity while building a warehouse management system in a remote area of Kazakhstan. The internet there was unreliable or nonexistent, yet the app needed to be fully functional—allowing workers to scan products and tag locations without interruption.
 
-## Part 1: Making the App Load Offline (Serwist)
+I found plenty of resources on PWAs (Service Workers) and separate resources on State Management (TanStack Query), but very few on how to combine them effectively for a true "Offline First" experience.
 
-Follow the [Serwist setup guide](https://serwist.dev/docs/getting-started/installation). I used the webpack config, but there's a turbopack option too.
+This repository serves as that missing link: a reference implementation demonstrating how to merge **Serwist** (for app shell caching) and **TanStack Query** (for data persistence and mutation queueing).
 
-The key is your `runtimeCaching` config in `sw.ts`. Here's mine:
+**Core Capabilities:**
+* **App Shell Caching:** Loads instantly even after a hard refresh without network (via Serwist).
+* **Data Persistence:** Reads cached data immediately when offline (via TanStack Query Persister).
+* **Mutation Queueing:** Queues actions (Create/Update/Delete) while offline and replays them automatically when connectivity is restored.
+* **Optimistic UI:** Updates the interface immediately, treating offline actions as "success" until proven otherwise.
 
-````ts
-const serwist = new Serwist({
-    // ...
-    runtimeCaching: [
-        // Never cache API routes—let TanStack Query handle those
-        {
-            matcher: ({ url, sameOrigin }) =>
-                sameOrigin && url.pathname.startsWith("/api/"),
-            handler: new NetworkOnly(),
-        },
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-        // Cache everything else (HTML, JS, CSS, images)
-        {
-            matcher: ({ url, sameOrigin }) =>
-                sameOrigin && !url.pathname.startsWith("/api/"),
-            handler: new StaleWhileRevalidate({
-                cacheName: "runtime-cache",
-                plugins: [
-                    new ExpirationPlugin({
-                        maxEntries: 200,
-                        maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
-                    }),
-                ],
-                matchOptions: {
-                    ignoreSearch: true,
-                    ignoreVary: true,
-                },
-            }),
-        },
-    ],
-});
-````
+## Tech Stack
 
-**Why `StaleWhileRevalidate`?** The app loads instantly from cache, then quietly updates in the background. For an app shell, this feels snappier than `CacheFirst` (which never revalidates) or `NetworkFirst` (which blocks on network).
+* **Framework:** [Next.js](https://nextjs.org/) (App Router)
+* **PWA/Service Worker:** [Serwist](https://serwist.dev/)
+* **State Management:** [TanStack Query](https://tanstack.com/query/latest) (with Persister)
+* **Storage:** [LocalForage](https://github.com/localforage/localforage) (IndexedDB wrapper)
+* **Database:** PostgreSQL (via Drizzle ORM)
+* **Styling:** Tailwind CSS & Shadcn UI
 
-**Why `ignoreVary: true`?** Next.js sometimes sends `Vary` headers that can cause cache misses on dynamic routes. This sidesteps that.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-**The tradeoff:** If someone doesn't open the app for 7+ days and they're offline, the cache expires and the app won't load. Bump `maxAgeSeconds` if your users go longer between visits.
+## Getting Started
 
----
+To get a local copy up and running, follow these steps.
 
-## Part 2: Caching Server State (TanStack Query)
+### Prerequisites
 
-All server interactions go through TanStack Query hooks—`useQuery` for reads, `useMutation` for writes. To persist the cache across sessions, you need `@tanstack/query-async-storage-persister`.
+* Node.js (v18+)
+* pnpm
+    ```sh
+    npm install -g pnpm
+    ```
+* Docker (Optional, for running PostgreSQL)
 
-Here's the provider setup:
+### Installation
 
-````tsx
-import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import localforage from "localforage";
+1.  Clone the repo
+    ```sh
+    git clone https://github.com/nomomon/offline-first-todo-app.git
+    cd offline-first-todo-app
+    ```
+2.  Install packages
+    ```sh
+    pnpm install
+    ```
+3.  Set up environment variables. Create a `.env` file in the root directory:
+    ```env
+    DATABASE_URL="postgresql://postgres:postgres@localhost:5432/todo_app"
+    NEXTAUTH_SECRET="your_super_secret_key"
+    NEXTAUTH_URL="http://localhost:3000"
+    GITHUB_ID=""
+    GITHUB_SECRET=""
+    ```
+4.  Start the database (using Docker Compose)
+    ```sh
+    docker-compose up -d db
+    ```
+5.  Run database migrations
+    ```sh
+    pnpm db:migrate
+    ```
+6.  Start the development server
+    ```sh
+    pnpm dev
+    ```
 
-const DAY_IN_MS = 1000 * 60 * 60 * 24;
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-const persister = createAsyncStoragePersister({
-    storage: localforage.createInstance({
-        name: "offline-first-todo-app",
-        storeName: "react-query",
-    }),
-});
+## Usage
 
-export function QueryProvider({ children }: { children: React.ReactNode }) {
-    const [queryClient] = useState(() =>
-        new QueryClient({
-            defaultOptions: {
-                queries: {
-                    networkMode: "offlineFirst",
-                    gcTime: DAY_IN_MS,
-                    staleTime: 5 * 60 * 1000,
-                    retry: 1,
-                },
-                mutations: {
-                    networkMode: "offlineFirst",
-                },
-            },
-        })
-    );
+Once running, the application acts as a fully offline-capable PWA.
 
-    return (
-        <PersistQueryClientProvider
-            client={queryClient}
-            persistOptions={{ persister, maxAge: DAY_IN_MS }}
-            onSuccess={() => {
-                queryClient.resumePausedMutations().then(() => {
-                    queryClient.invalidateQueries();
-                });
-            }}
-        >
-            {children}
-        </PersistQueryClientProvider>
-    );
-}
-````
+1.  **Offline Simulation:** Open the browser DevTools, go to the Network tab, and set it to "Offline".
+2.  **CRUD Actions:** Create, edit, or delete todos. Notice the UI updates immediately.
+3.  **Sync:** Re-enable the network. You will see the pending requests fire automatically to sync with the server.
 
-**What's different from a normal setup:**
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-1. **Storage:** `localforage` wraps IndexedDB. This is where your cache lives when the tab closes.
-2. **Provider:** `PersistQueryClientProvider` rehydrates the cache on load.
-3. **`onSuccess`:** After rehydration, `resumePausedMutations()` replays any mutations that were queued while offline.
-4. **`networkMode: "offlineFirst"`:** This is critical. By default, TanStack Query pauses entirely when the browser reports no network. This mode lets it serve cached data anyway.
+## License
 
----
+Distributed under the MIT License.
 
-## Important: Mutations Don't Serialize
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-Here's where I got stuck for a while.
+## Contact
 
-When you queue a mutation offline, TanStack Query persists the *data* (e.g., the new todo object). But it can't persist the *function* that executes it. So if the user reloads while offline, the mutation is stuck—it has the payload but no idea what to do with it.
+Mansur Nurmukhambetov - [@nomomon](https://github.com/nomomon)
 
-Fix: re-register mutation functions on startup.
-
-````tsx
-function registerOfflineMutationDefaults(queryClient: QueryClient) {
-    queryClient.setMutationDefaults(["createTodo"], {
-        mutationFn: createTodo,
-    });
-    queryClient.setMutationDefaults(["updateTodo"], {
-        mutationFn: updateTodo,
-    });
-    queryClient.setMutationDefaults(["deleteTodo"], {
-        mutationFn: deleteTodo,
-    });
-}
-````
-
-Call this before rendering. Now when `resumePausedMutations()` runs, it knows which function to call for each mutation key.
-
----
-
-## Optimistic Updates (Important for Offline)
-
-If you're offline and create a todo, you can't wait for the server. The UI needs to update immediately. This means manually updating the cache in `onMutate`:
-
-````tsx
-useMutation({
-    mutationKey: ["createTodo"],
-    mutationFn: createTodo,
-    onMutate: async (newTodo) => {
-        await queryClient.cancelQueries({ queryKey: ["todos"] });
-        const previous = queryClient.getQueryData(["todos"]);
-
-        queryClient.setQueryData(["todos"], (old: Todo[]) => [
-            ...old,
-            { ...newTodo, id: crypto.randomUUID(), createdAt: new Date() },
-        ]);
-
-        return { previous };
-    },
-    onError: (_err, _newTodo, context) => {
-        queryClient.setQueryData(["todos"], context?.previous);
-    },
-    onSettled: () => {
-        queryClient.invalidateQueries({ queryKey: ["todos"] });
-    },
-});
-````
-
-The pattern: snapshot the old data, optimistically insert the new item with a temporary ID, and roll back on error. When the mutation eventually succeeds (maybe hours later), `onSettled` invalidates the query to sync with the real server state.
-
-For more details, see the [TanStack Query docs on optimistic updates](https://tanstack.com/query/latest/docs/framework/react/guides/optimistic-updates).
-
----
-
-## Wrapping Up
-
-Honestly, this mix qas really nice. It was a while since setting up offline apps by hand—it and it was just too hard, but Serwist made it super simple. And since I already use TanStack Query for data, hooking them up felt really natural.
-
-I love that they just work side-by-side without getting in each other's way. Definitely sticking with this setup!
-
-[Full source on GitHub](https://github.com/nomomon/offline-first-todo-app)
+Project Link: https://github.com/nomomon/offline-first-todo-app
