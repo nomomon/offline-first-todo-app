@@ -1,3 +1,5 @@
+"use client";
+
 import { useSearchParams } from "next/navigation";
 import { TodoList } from "@/components/todos/todo-list";
 import type { TodoFilter } from "@/lib/db/repository/todos";

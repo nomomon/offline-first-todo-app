@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import { Github } from "lucide-react";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { AuthProvider } from "@/components/providers/session-provider";
@@ -101,6 +102,17 @@ export default function RootLayout({
 						</QueryProvider>
 					</AuthProvider>
 				</ThemeProvider>
+
+				{/* GitHub Attribution Link */}
+				<a
+					href="https://github.com/nomomon/offline-first-todo-app"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="fixed top-4 right-4 z-50 flex items-center justify-center w-8 h-8 bg-background/80 backdrop-blur-sm border rounded-full shadow-lg hover:bg-background hover:shadow-xl transition-all duration-200 hover:scale-105"
+					aria-label="View source on GitHub"
+				>
+					<Github className="w-5 h-5" />
+				</a>
 			</body>
 		</html>
 	);
