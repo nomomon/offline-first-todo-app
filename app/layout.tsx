@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
@@ -36,7 +37,6 @@ export const metadata: Metadata = {
 		"task manager",
 		"tanstack query",
 		"serwist",
-		"warehouse operations",
 	],
 	category: "productivity",
 	manifest: "/manifest.json",
@@ -82,6 +82,14 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" dir="ltr" suppressHydrationWarning>
+			<head>
+				<Script
+					defer
+					src="https://umami.nomomon.xyz/script.js"
+					data-website-id="04e3d459-c450-4657-bbb2-3a62ed7c362b"
+					strategy="afterInteractive"
+				/>
+			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
