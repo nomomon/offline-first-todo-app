@@ -9,23 +9,21 @@
 <h3 align="center">Offline First Todo App</h3>
 
   <p align="center">
-    🧪 <strong>A learning experiment in building offline-first PWAs</strong>
+    A learning project exploring offline-first PWA architecture
     <br />
-    <em>A hands-on tutorial project exploring how to combine Service Workers and State Management for true offline capability</em>
-    <br />
-    <br />
-    <a href="https://nomomon.xyz/posts/offline-first-pwa-tutorial"><strong>📖 Read the Full Tutorial »</strong></a>
+    Built with Next.js, Serwist, and TanStack Query
     <br />
     <br />
-    <a href="https://todo.nomomon.xyz">View Live Demo</a>
+    <a href="https://nomomon.xyz/posts/offline-first-pwa-tutorial"><strong>📖 Read the Tutorial »</strong></a>
+    <br />
+    <br />
+    <a href="https://todo.nomomon.xyz">View Demo</a>
     ·
     <a href="https://github.com/nomomon/offline-first-todo-app/issues">Report Bug</a>
     ·
     <a href="https://github.com/nomomon/offline-first-todo-app/issues">Request Feature</a>
   </p>
 </div>
-
-> **Note:** This is a personal learning project documenting my journey building a warehouse management system for remote areas with unreliable internet. It serves as both a tutorial and reference implementation for anyone looking to understand offline-first architecture.
 
 <details>
   <summary>Table of Contents</summary>
